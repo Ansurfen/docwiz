@@ -68,4 +68,4 @@ This software is licensed under the MIT license, see [LICENSE](./LICENSE) for mo
 
 ---
 
-_This README was generated with ❤️ by [docwiz](https://github.com/ansurfen/docwiz)_
+_This Markdown was generated with ❤️ by [docwiz](https://github.com/ansurfen/docwiz)_

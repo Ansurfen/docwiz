@@ -50,7 +50,7 @@ enhancing the commit message with relevant emojis based on predefined mappings.`
 			msg := addGitEmoji(commitParameter.message)
 
 			if commitParameter.exec {
-				cmd := exec.Command("git", "commit", "-m", fmt.Sprintf(`"%s"`, msg))
+				cmd := exec.Command("git", "commit", "-m", msg)
 
 				cmd.Stdout = os.Stdout
 				cmd.Stdin = os.Stdin
