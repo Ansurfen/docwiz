@@ -1,0 +1,10 @@
+{
+    "questions": [
+        {
+            "suggest": "Is your project a library? (y/n)",
+            "binding": "IsLib",
+            "default": "y",
+            "required": true
+        }
+    ]
+}
