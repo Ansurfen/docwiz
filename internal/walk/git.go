@@ -16,7 +16,10 @@ func (*GitWalker) SubscribeDir() []string {
 }
 
 func (*GitWalker) ParseDir(fullpath string, dir string, ctx *Context) error {
-	repo := git.New(fullpath)
+	repo, err := git.New(fullpath)
+	if err != nil {
+		return err
+	}
 
 	ctx.ProjectName = repo.Name()
 	ctx.ProjectOwner = repo.Owner()

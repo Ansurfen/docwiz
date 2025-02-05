@@ -15,9 +15,8 @@ Our project is evolving and we want to keep track of key milestones. Here's the 
 
 ## 🛠️ **Phase 2: Feature Expansion ({{$quarter | quarterModify "+1"}})**
 
-- **🚀 Launch version 1.0**: Official release of version 1.0 with core features.
-- **🧪 Unit testing**: 
-- **🔒 Security improvements**: Add two-factor authentication and other security features.
+- **🚀 Launch stable version**: Official release of version 1.0 with core features.
+- **🔒 Security improvements**: More than 95% coverage of unit testing
 - **🐛 Bug fixes**: Address critical bugs reported by users in version 1.0.
 
 ---

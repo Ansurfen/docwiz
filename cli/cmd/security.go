@@ -4,13 +4,16 @@
 package cmd
 
 import (
+	"docwiz/internal/git"
 	"docwiz/internal/io"
+	"docwiz/internal/log"
 	"docwiz/internal/os"
 	. "docwiz/internal/template"
 	"fmt"
-	"github.com/spf13/cobra"
 	"html/template"
 	"path/filepath"
+
+	"github.com/spf13/cobra"
 )
 
 type securityCmdParameter struct {
@@ -18,6 +21,8 @@ type securityCmdParameter struct {
 	output    string
 	theme     string
 	copyright bool
+	repoPath  string
+	email     string
 }
 
 var (
@@ -30,6 +35,19 @@ var (
 	data privacy, and secure coding guidelines.`,
 		Example: "  docwiz security",
 		Run: func(cmd *cobra.Command, args []string) {
+			var (
+				name  string
+				owner string
+			)
+
+			repo, err := git.New(securityParameter.repoPath)
+			if err == nil {
+				name = repo.Name()
+				owner = repo.Owner()
+			} else {
+				log.Warnf("fail to read git repository, err: %s", err.Error())
+			}
+
 			securityPath := filepath.Join(os.TemplatePath, "SECURITY")
 			tpl := filepath.Join(securityPath, fmt.Sprintf("%s.tpl", securityParameter.theme))
 
@@ -52,7 +70,11 @@ var (
 				panic(err)
 			}
 
-			err = tmpl.Execute(output, nil)
+			err = tmpl.Execute(output, map[string]any{
+				"ProjectName":  name,
+				"ProjectOwner": owner,
+				"Email":        securityParameter.email,
+			})
 			if err != nil {
 				panic(err)
 			}
@@ -69,4 +91,6 @@ func init() {
 	securityCmd.PersistentFlags().StringVarP(&securityParameter.output, "output", "o", "SECURITY.md", "Path to save the generated security file")
 	securityCmd.PersistentFlags().StringVarP(&securityParameter.theme, "theme", "t", "default", "Theme for the security template")
 	securityCmd.PersistentFlags().BoolVarP(&securityParameter.copyright, "copyright", "c", true, "Include copyright information in the security")
+	securityCmd.PersistentFlags().StringVarP(&securityParameter.repoPath, "repo", "r", ".", "Path to the target Git repository")
+	securityCmd.PersistentFlags().StringVarP(&securityParameter.email, "email", "e", "", "Email to contact and report issues")
 }

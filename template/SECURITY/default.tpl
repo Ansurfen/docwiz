@@ -12,7 +12,7 @@ If you discover a security vulnerability, we encourage you to responsibly disclo
    - We appreciate your desire to help, but publicly discussing the vulnerability may put users at risk.
   
 2. **Report the issue privately.** 📨
-   - Please email us at: [security@example.com](mailto:security@example.com) or use our secure issue reporting system on [our GitHub repository](https://github.com/yourrepo/security).
+   - Please email us at: [{{.Email | default "<!-- email -->" | unescape}}]({{.Email | default "<!-- email -->" | unescape}}) or use our secure issue reporting system on [our GitHub repository](https://github.com/{{.ProjectOwner | default "<!-- projectOwner -->"| unescape}}/{{.ProjectName | default "<!-- projectOwner -->" | unescape}}/security).
 
 3. **Include the following information in your report:** 📝
    - A detailed description of the vulnerability.
@@ -43,7 +43,7 @@ Security patches will be included in the next minor or major release, or as an u
 
 We track known security vulnerabilities and fixes. You can view our current list of open and resolved vulnerabilities here:
 
-- [Security Advisories](https://github.com/yourrepo/advisories)
+- [Security Advisories](https://github.com/{{.ProjectOwner | default "<!-- projectOwner -->"| unescape}}/{{.ProjectName | default "<!-- projectOwner -->" | unescape}}/security/advisories)
 
 We also publish detailed security advisories for each vulnerability with recommendations on how to mitigate the issue.
 
@@ -77,7 +77,7 @@ This project is committed to complying with relevant security standards, includi
 - [Health Insurance Portability and Accountability Act (HIPAA)](https://www.hhs.gov/hipaa/index.html)
 - [Federal Information Security Management Act (FISMA)](https://csrc.nist.gov/projects/risk-management)
 
-If you have any questions regarding our compliance or security practices, please contact us at [security@example.com](mailto:security@example.com).
+If you have any questions regarding our compliance or security practices, please contact us at [{{.Email | default "<!-- email -->" | unescape}}]({{.Email | default "<!-- email -->" | unescape}}).
 
 ---
 

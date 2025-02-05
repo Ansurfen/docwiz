@@ -35,17 +35,17 @@ type Repository struct {
 	repoPath string
 }
 
-func New(repoPath string) *Repository {
+func New(repoPath string) (*Repository, error) {
 	repo, err := git.PlainOpen(repoPath)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	r := &Repository{repo: repo, repoPath: repoPath}
 
 	remotes, err := repo.Remotes()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	for _, remote := range remotes {
@@ -60,7 +60,7 @@ func New(repoPath string) *Repository {
 
 			parsedURL, err := url.Parse(remoteURL)
 			if err != nil {
-				panic(err)
+				return nil, err
 			}
 			switch host := parsedURL.Hostname(); host {
 			case "github":
@@ -80,7 +80,7 @@ func New(repoPath string) *Repository {
 			// ${r.url}/username/repository.git
 			re := regexp.MustCompile(fmt.Sprintf(`^%s[:/](.*?)/(.*?)(?:\.git)?$`, regexp.QuoteMeta(r.url)))
 			matches := re.FindStringSubmatch(remoteURL)
-			 
+
 			if len(matches) > 2 {
 				r.owner = matches[1]
 				r.name = matches[2]
@@ -90,7 +90,7 @@ func New(repoPath string) *Repository {
 		}
 	}
 
-	return r
+	return r, nil
 }
 
 func (r *Repository) Owner() string {

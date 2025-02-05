@@ -43,7 +43,11 @@ to extract and list all contributors who have committed changes.`,
 				}
 			}()
 
-			r := git.New(contributorsParameter.repoPath)
+			r, err := git.New(contributorsParameter.repoPath)
+			if err != nil {
+				panic(err)
+			}
+
 			err = r.GenerateContributors(output)
 			if err != nil {
 				panic(err)

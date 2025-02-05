@@ -39,7 +39,10 @@ var (
 				}
 			}()
 
-			r := git.New(changelogParameter.repoPath)
+			r, err := git.New(changelogParameter.repoPath)
+			if err != nil {
+				panic(err)
+			}
 
 			err = r.GenerateChangelog(output)
 			if err != nil {

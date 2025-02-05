@@ -7,24 +7,43 @@ Thank you for considering contributing to our project! 🙌 We are thrilled to h
 There are several ways you can contribute to the project:
 
 1. **Reporting Bugs** 🐞  
-   If you encounter a bug, please open an issue on GitHub. Make sure to include as much detail as possible to help us understand the issue.
+   If you encounter a bug, please open an issue on GitHub. Make sure to include as much detail as possible to help us understand the issue.  
+   **Example Issue Template:**  
+   _Insert template for bug report_
 
 2. **Suggesting Features** 💡  
-   Have an idea for a new feature or improvement? Please open an issue and describe your suggestion. We would love to hear from you!
+   Have an idea for a new feature or improvement? Please open an issue and describe your suggestion. We would love to hear from you!  
+   **Example Feature Template:**  
+   _Insert template for feature suggestion_
 
 3. **Submitting Code** 🧑‍💻  
    If you're interested in writing code, please follow these steps:
-   
-   - Fork the repository and create a new branch for your feature or fix:  
+
+   - **Clone the repository**  
+     First, clone the repository to your local machine:  
+     `git clone https://github.com/{{.ProjectOwner | default "<!-- projectOwner -->"| unescape}}/{{.ProjectName | default "<!-- projectOwner -->" | unescape}}.git`
+     
+   - **Fork and create a new branch**  
+     Fork the repository and create a new branch for your feature or fix:  
      `git checkout -b feature/my-feature`
-   - Make your changes.
-   - Write tests if applicable. 🧪
-   - Ensure all existing tests pass by running the test suite:  
+   
+   - **Make your changes.**  
+     _Describe the changes you've made._
+
+   - **Write tests if applicable.** 🧪  
+     _Add unit tests or integration tests as needed._
+
+   - **Run the tests**  
+     Ensure all existing tests pass by running the test suite:  
      `go test ./...`
-   - Commit your changes with a clear message and push them to your fork:
-     `git commit -am "Add my feature"`
+
+   - **Commit your changes**  
+     Commit your changes with a clear message and push them to your fork:  
+     `git commit -am "Add my feature"`  
      `git push origin feature/my-feature`
-   - Submit a pull request to the main branch.
+
+   - **Create a Pull Request**  
+     Finally, submit a pull request to the `main` branch.
 
 4. **Improving Documentation** 📚  
    Contributions to the documentation are always welcome! If you spot an error or find something unclear, feel free to fix it or provide a suggestion.
