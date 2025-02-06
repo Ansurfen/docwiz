@@ -231,6 +231,10 @@ type TagInfo struct {
 	Commit *object.Commit
 }
 
+func (r *Repository) GetTags() []TagInfo {
+	return r.getSortedTags(r.repo)
+}
+
 // getSortedTags returns all tags and sort (by commit time)
 func (r *Repository) getSortedTags(repo *git.Repository) []TagInfo {
 	var tags []TagInfo

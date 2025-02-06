@@ -54,7 +54,7 @@ If you witness or experience any unacceptable behavior, please report it to us i
 You can report by:
 
 - **Opening an issue** on the GitHub repository 📂
-- **Contacting us via email**: [{{.Email | default "<!-- email -->" | unescape}}]({{.Email | default "<!-- email -->" | unescape}}) 📧
+- **Contacting us via email**: [<!-- email -->](<!-- email -->) 📧
 
 We will take all reports seriously and act accordingly.
 
@@ -81,3 +81,7 @@ Thank you to all the contributors who help maintain this community's positive at
 ## Attribution ✨
 
 This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/), version 1.4, available at [https://www.contributor-covenant.org/version/1/4/code-of-conduct.html](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html).
+
+---
+
+_This Markdown was generated with ❤️ by [docwiz](https://github.com/ansurfen/docwiz)_

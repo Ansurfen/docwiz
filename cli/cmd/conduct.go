@@ -19,6 +19,7 @@ type CodeOfConductCmdParameter struct {
 	output    string
 	theme     string
 	copyright bool
+	email     string
 }
 
 var (
@@ -51,7 +52,9 @@ which includes guidelines for respectful behavior, inclusivity, and maintaining 
 				panic(err)
 			}
 
-			err = tmpl.Execute(output, nil)
+			err = tmpl.Execute(output, map[string]any{
+				"Email": conductParameter.email,
+			})
 			if err != nil {
 				panic(err)
 			}
@@ -68,4 +71,5 @@ func init() {
 	conductCmd.PersistentFlags().StringVarP(&conductParameter.output, "output", "o", "CODE_OF_CONDUCT.md", "Path to save the generated conduct file")
 	conductCmd.PersistentFlags().StringVarP(&conductParameter.theme, "theme", "t", "default", "Theme for the conduct template")
 	conductCmd.PersistentFlags().BoolVarP(&conductParameter.copyright, "copyright", "c", true, "Include copyright information in the conduct")
+	conductCmd.PersistentFlags().StringVarP(&conductParameter.email, "email", "e", "", "Email to contact and report issues")
 }

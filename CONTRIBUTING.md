@@ -21,7 +21,7 @@ There are several ways you can contribute to the project:
 
    - **Clone the repository**  
      First, clone the repository to your local machine:  
-     `git clone https://github.com/{{.ProjectOwner | default "<!-- projectOwner -->"| unescape}}/{{.ProjectName | default "<!-- projectOwner -->" | unescape}}.git`
+     `git clone https://github.com/Ansurfen/docwiz.git`
      
    - **Fork and create a new branch**  
      Fork the repository and create a new branch for your feature or fix:  
@@ -55,8 +55,7 @@ We follow a consistent coding style throughout the project. Please:
 - Use descriptive variable and function names.
 - Keep lines of code under 80 characters.
 - Add comments where necessary to explain complex logic.
-<!-- Replace it with the language of your project -->
-<!-- - Follow Go code formatting (use `gofmt`). -->
+- Follow Go code formatting (use `gofmt`).
 - Make sure your code passes the linter.
 
 ## Testing 🧪
@@ -84,3 +83,7 @@ By contributing to this project, you agree to follow our [Code of Conduct](CODE_
 We appreciate every contribution, no matter how big or small. Thank you for being part of our community! 🌍 If you have any questions, don't hesitate to reach out.
 
 Happy coding! 🚀
+
+---
+
+_This Markdown was generated with ❤️ by [docwiz](https://github.com/ansurfen/docwiz)_

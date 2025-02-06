@@ -16,7 +16,21 @@
 > DocWiz is a versatile command-line tool that helps generate various types of project documentation like README, LICENSE, ROADMAP, CONTRIBUTORS, and more. It leverages templates and user inputs to create customized and professional documentation files.
 
 ## 📦 Install
-<!-- description -->
+
+### build by yourself
+```bash
+git clone git@github.com:Ansurfen/docwiz.git
+cd ./docwiz
+
+# windows
+./build.ps1
+
+# linux, darwin
+./build.sh
+```
+
+### download
+You can download the binary version [here](https://github.com/Ansurfen/docwiz/releases).
 
 ## 🚀 Usage
 > [!NOTE]
