@@ -16,11 +16,9 @@ import (
 )
 
 type RoadMapCmdParameter struct {
-	theme     string
-	kind      string
-	output    string
-	data      map[string]string
-	copyright bool
+	baseParameter
+	kind string
+	data map[string]string
 }
 
 var (
@@ -35,35 +33,43 @@ based on predefined templates and provide information like versioning, kind, the
 			roadMapPath := filepath.Join(os.TemplatePath, "ROADMAP")
 
 			tpl := filepath.Join(roadMapPath, fmt.Sprintf("%s.%s.tpl", roadMapParameter.kind, roadMapParameter.theme))
-
-			output, err := io.NewSafeFile(roadMapParameter.output)
-			if err != nil {
-				panic(err)
+			if roadMapParameter.language != defaultLanguage {
+				tpl = filepath.Join(roadMapPath, roadMapParameter.language, fmt.Sprintf("%s.%s.tpl", roadMapParameter.kind, roadMapParameter.theme))
 			}
-			defer output.Close()
+			gen := &generator{
+				output: roadMapParameter.output,
+				action: func() {
+					output, err := io.NewSafeFile(roadMapParameter.output)
+					if err != nil {
+						panic(err)
+					}
+					defer output.Close()
 
-			defer func() {
-				if err := recover(); err != nil {
-					output.Rollback()
-				}
-			}()
+					defer func() {
+						if err := recover(); err != nil {
+							output.Rollback()
+						}
+					}()
 
-			tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(roadMapPath)).ParseFiles(tpl)
-			if err != nil {
-				panic(err)
+					tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(roadMapPath)).ParseFiles(tpl)
+					if err != nil {
+						panic(err)
+					}
+
+					err = tmpl.Execute(output, map[string]string{
+						"Version": roadMapParameter.data["version"],
+					})
+
+					if err != nil {
+						panic(err)
+					}
+
+					if !roadMapParameter.disableCopyright {
+						output.Write(COPYRIGHT)
+					}
+				},
 			}
-
-			err = tmpl.Execute(output, map[string]string{
-				"Version": roadMapParameter.data["version"],
-			})
-
-			if err != nil {
-				panic(err)
-			}
-
-			if roadMapParameter.copyright {
-				output.Write([]byte(COPYRIGHT))
-			}
+			gen.run()
 		},
 	}
 )
@@ -72,7 +78,8 @@ func init() {
 	docwizCmd.AddCommand(roadMapCmd)
 	roadMapCmd.PersistentFlags().StringVarP(&roadMapParameter.output, "output", "o", "ROADMAP.md", "Path to save the generated roadmap file")
 	roadMapCmd.PersistentFlags().StringVarP(&roadMapParameter.theme, "theme", "t", "default", "Theme for the roadmap template")
-	roadMapCmd.PersistentFlags().StringVarP(&roadMapParameter.kind, "kind", "k", "quarter", "Kind of roadmap (e.g., quarter, year, etc.)")
+	roadMapCmd.PersistentFlags().StringVarP(&roadMapParameter.kind, "kind", "k", "quarter", "Kind of roadmap (e.g., quarter, version, etc.)")
 	roadMapCmd.PersistentFlags().StringToStringVarP(&roadMapParameter.data, "data", "d", nil, "Additional data to inject into the template (e.g., version=1.0.0)")
-	roadMapCmd.PersistentFlags().BoolVarP(&roadMapParameter.copyright, "copyright", "c", true, "Include copyright information in the roadmap")
+	roadMapCmd.PersistentFlags().BoolVarP(&roadMapParameter.disableCopyright, "disable-copyright", "", false, "Disable copyright information in the roadmap")
+	roadMapCmd.PersistentFlags().StringVarP(&roadMapParameter.language, "language", "l", "en_us", "Set the language for contributing file (e.g. zh_cn)")
 }

@@ -15,10 +15,7 @@ import (
 
 // authorsCmdParameter to store parameters related to the authors command.
 type authorsCmdParameter struct {
-	theme string
-
-	// The path and filename of the output file
-	output string
+	baseParameter
 
 	// The type of license (e.g., MIT, Apache, etc.)
 	license string
@@ -28,8 +25,6 @@ type authorsCmdParameter struct {
 	contributors []string
 
 	specialContributors []string
-
-	copyright bool
 }
 
 var (
@@ -77,28 +72,41 @@ var (
 			}
 
 			tpl := filepath.Join(execPath, fmt.Sprintf("../template/AUTHORS/%s.tpl", authorsParameter.theme))
-
-			output, err := os.Create(authorsParameter.output)
-			if err != nil {
-				panic(err)
-			}
-			defer output.Close()
-
-			tmpl, err := template.ParseFiles(tpl)
-			if err != nil {
-				panic(err)
+			if authorsParameter.language != defaultLanguage {
+				tpl = filepath.Join(execPath, authorsParameter.language, fmt.Sprintf("../template/AUTHORS/%s.tpl", authorsParameter.theme))
 			}
 
-			err = tmpl.Execute(output, map[string]any{
-				"Maintainers":         maintainers,
-				"Contributors":        contributors,
-				"SpecialContributors": specialContributors,
-				"License":             authorsParameter.license,
-				"Copyright":           authorsParameter.copyright,
-			})
-			if err != nil {
-				panic(err)
+			gen := &generator{
+				output: authorsParameter.output,
+				action: func() {
+					output, err := os.Create(authorsParameter.output)
+					if err != nil {
+						panic(err)
+					}
+					defer output.Close()
+
+					tmpl, err := template.ParseFiles(tpl)
+					if err != nil {
+						panic(err)
+					}
+
+					err = tmpl.Execute(output, map[string]any{
+						"Maintainers":         maintainers,
+						"Contributors":        contributors,
+						"SpecialContributors": specialContributors,
+						"License":             authorsParameter.license,
+						"Copyright":           authorsParameter.disableCopyright,
+					})
+					if err != nil {
+						panic(err)
+					}
+
+					if !authorsParameter.disableCopyright {
+						output.Write(COPYRIGHT)
+					}
+				},
 			}
+			gen.run()
 		},
 	}
 )
@@ -110,10 +118,12 @@ func init() {
 	// Define the flags for the authors command with their default values and descriptions
 	authorsCmd.PersistentFlags().StringVarP(&authorsParameter.theme, "theme", "t", "default", "Template theme to use for the AUTHORS file")
 	authorsCmd.PersistentFlags().StringVarP(&authorsParameter.output, "output", "o", "AUTHORS.md", "Path to the output authors file")
-	authorsCmd.PersistentFlags().StringVarP(&authorsParameter.license, "license", "l", "", "License type to include in the AUTHORS file (e.g., MIT, Apache)")
+	authorsCmd.PersistentFlags().StringVarP(&authorsParameter.license, "license", "L", "", "License type to include in the AUTHORS file (e.g., MIT, Apache)")
 	authorsCmd.PersistentFlags().StringArrayVarP(&authorsParameter.maintainers, "maintainers", "m", []string{}, "List of maintainers in JSON format")
 	authorsCmd.PersistentFlags().StringArrayVarP(&authorsParameter.contributors, "contributors", "c", []string{}, "List of contributors in JSON format")
 	authorsCmd.PersistentFlags().StringArrayVarP(&authorsParameter.specialContributors, "special-contributors", "s", []string{}, "List of special contributors in JSON format")
+	authorsCmd.PersistentFlags().BoolVarP(&authorsParameter.disableCopyright, "disable-copyright", "d", false, "Disable copyright information in the authors")
+	authorsCmd.PersistentFlags().StringVarP(&authorsParameter.language, "language", "l", "en_us", "Set the language for contributing file (e.g. zh_cn)")
 }
 
 type User struct {

@@ -14,17 +14,14 @@ import (
 	"html/template"
 	"io/fs"
 	"path/filepath"
-	"time"
 
 	"github.com/spf13/cobra"
 )
 
 type readmeCmdParameter struct {
-	output    string
-	language  string
-	theme     string
-	copyright bool
-	scan      bool
+	baseParameter
+	scan     bool
+	template string
 }
 
 var (
@@ -49,10 +46,15 @@ theme, and whether to include copyright information.`,
 					readmeParameter.output = "README.md"
 				}
 
+				tpl := filepath.Join(os.TemplatePath, "README", "README.tpl")
+				if readmeParameter.language != defaultLanguage {
+					tpl = filepath.Join(os.TemplatePath, "README", readmeParameter.language, "README.tpl")
+				}
+
 				ctx := &walk.Context{
 					Ignore:   ignore,
 					Output:   readmeParameter.output,
-					Template: filepath.Join(os.TemplatePath, "README", "README.tpl"),
+					Template: tpl,
 					Walkers: []walk.Walker{
 						&walk.AndroidWalker{},
 						&walk.BashWalker{},
@@ -111,39 +113,46 @@ theme, and whether to include copyright information.`,
 					},
 				}
 				walk.Walk(".", ctx)
-				tpl := filepath.Join(os.TemplatePath, "README", "README.tpl")
-				tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(tpl)).ParseFiles(tpl)
-				if err != nil {
-					panic(err)
-				}
-				output, err := io.NewSafeFile(readmeParameter.output)
-				if err != nil {
-					panic(err)
-				}
-				defer output.Close()
 
-				defer func() {
-					if err := recover(); err != nil {
-						output.Rollback()
-						fmt.Println(err)
-					}
-				}()
+				gen := &generator{
+					output: readmeParameter.output,
+					action: func() {
 
-				err = tmpl.Execute(output, map[string]any{
-					"ProjectName":        ctx.ProjectName,
-					"ProjectOwner":       ctx.ProjectOwner,
-					"ProjectStack":       ctx.ProjectStack,
-					"ProjectDescription": ctx.ProjectDescription,
-					"Sections":           ctx.Sections,
-				})
+						tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(tpl)).ParseFiles(tpl)
+						if err != nil {
+							panic(err)
+						}
+						output, err := io.NewSafeFile(readmeParameter.output)
+						if err != nil {
+							panic(err)
+						}
+						defer output.Close()
 
-				if err != nil {
-					panic(err)
+						defer func() {
+							if err := recover(); err != nil {
+								output.Rollback()
+								fmt.Println(err)
+							}
+						}()
+
+						err = tmpl.Execute(output, map[string]any{
+							"ProjectName":        ctx.ProjectName,
+							"ProjectOwner":       ctx.ProjectOwner,
+							"ProjectStack":       ctx.ProjectStack,
+							"ProjectDescription": ctx.ProjectDescription,
+							"Sections":           ctx.Sections,
+						})
+
+						if err != nil {
+							panic(err)
+						}
+
+						if !readmeParameter.disableCopyright {
+							output.Write(COPYRIGHT)
+						}
+					},
 				}
-
-				if readmeParameter.copyright {
-					output.Write([]byte(COPYRIGHT))
-				}
+				gen.run()
 			} else {
 				var language string
 				if len(readmeParameter.language) != 0 {
@@ -179,15 +188,15 @@ theme, and whether to include copyright information.`,
 				}
 
 				var (
-					languageDir = filepath.Join(os.TemplatePath, "README")
+					templateDir = filepath.Join(os.TemplatePath, "README")
 					questions   = tui.DefaultQuestion
 				)
 
 				if language != "none" {
-					languageDir = filepath.Join(languageDir, language)
+					templateDir = filepath.Join(templateDir, language)
 					var index tui.IndexFile
 
-					err := io.ReadJSON(filepath.Join(languageDir, "index.json"), &index)
+					err := io.ReadJSON(filepath.Join(templateDir, "index.json"), &index)
 					if err != nil {
 						panic(err)
 					}
@@ -201,38 +210,43 @@ theme, and whether to include copyright information.`,
 					panic(err)
 				}
 
-				tpl := filepath.Join(languageDir, fmt.Sprintf("%s.tpl", readmeParameter.theme))
+				gen := &generator{
+					output: readmeParameter.output,
+					action: func() {
+						tpl := filepath.Join(templateDir, fmt.Sprintf("%s.tpl", readmeParameter.theme))
+						if readmeParameter.language != defaultLanguage {
+							tpl = filepath.Join(templateDir, readmeParameter.language, fmt.Sprintf("%s.tpl", readmeParameter.theme))
+						}
 
-				tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(languageDir)).ParseFiles(tpl)
-				if err != nil {
-					panic(err)
+						tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(templateDir)).ParseFiles(tpl)
+						if err != nil {
+							panic(err)
+						}
+
+						output, err := io.NewSafeFile(readmeParameter.output)
+						if err != nil {
+							panic(err)
+						}
+						defer output.Close()
+
+						defer func() {
+							if err := recover(); err != nil {
+								output.Rollback()
+								fmt.Println(err)
+							}
+						}()
+
+						err = tmpl.Execute(output, m.Value())
+						if err != nil {
+							panic(err)
+						}
+
+						if !readmeParameter.disableCopyright {
+							output.Write(COPYRIGHT)
+						}
+					},
 				}
-
-				output, err := io.NewSafeFile(readmeParameter.output)
-				if err != nil {
-					panic(err)
-				}
-				defer output.Close()
-
-				defer func() {
-					if err := recover(); err != nil {
-						output.Rollback()
-						fmt.Println(err)
-					}
-				}()
-
-				err = tmpl.Execute(output, m.Value())
-				if err != nil {
-					panic(err)
-				}
-
-				if readmeParameter.copyright {
-					output.Write([]byte(COPYRIGHT))
-				}
-
-				tui.NewSpinner(2*time.Second, "Generating README.md...").Run()
-
-				tui.NewTextFrame("READEME.md was successfully generated.\n\nThanks for using docwiz!").Run()
+				gen.run()
 			}
 		},
 	}
@@ -241,8 +255,9 @@ theme, and whether to include copyright information.`,
 func init() {
 	docwizCmd.AddCommand(readmeCmd)
 	readmeCmd.PersistentFlags().StringVarP(&readmeParameter.output, "output", "o", "README.md", "Path to save the generated README file")
-	readmeCmd.PersistentFlags().StringVarP(&readmeParameter.language, "language", "l", "", "Programming language for the README template")
+	readmeCmd.PersistentFlags().StringVarP(&readmeParameter.template, "template", "T", "", "Programming language for the README template")
 	readmeCmd.PersistentFlags().StringVarP(&readmeParameter.theme, "theme", "t", "default", "Theme of the README template")
-	readmeCmd.PersistentFlags().BoolVarP(&readmeParameter.copyright, "copyright", "c", true, "Include copyright information in the README")
+	readmeCmd.PersistentFlags().BoolVarP(&readmeParameter.disableCopyright, "disable-copyright", "d", false, "Disable copyright information in the README")
 	readmeCmd.PersistentFlags().BoolVarP(&readmeParameter.scan, "scan", "s", false, "Automatically scan and generate")
+	readmeCmd.PersistentFlags().StringVarP(&readmeParameter.language, "language", "l", "en_us", "Set the language for contributing file (e.g. zh_cn)")
 }

@@ -17,11 +17,8 @@ import (
 )
 
 type contributingCmdParameter struct {
-	// The path and filename of the output file
-	output    string
-	theme     string
-	copyright bool
-	repoPath  string
+	baseParameter
+	repoPath string
 }
 
 var (
@@ -49,36 +46,45 @@ You can provide information like contribution guidelines, code of conduct, and s
 			contributingPath := filepath.Join(os.TemplatePath, "CONTRIBUTING")
 
 			tpl := filepath.Join(contributingPath, fmt.Sprintf("%s.tpl", contributingParameter.theme))
-			output, err := io.NewSafeFile(contributingParameter.output)
-			if err != nil {
-				panic(err)
+			if contributingParameter.language != defaultLanguage {
+				tpl = filepath.Join(contributingPath, contributingParameter.language, fmt.Sprintf("%s.tpl", contributingParameter.theme))
 			}
-			defer output.Close()
+			gen := &generator{
+				output: contributingParameter.output,
+				action: func() {
+					output, err := io.NewSafeFile(contributingParameter.output)
+					if err != nil {
+						panic(err)
+					}
+					defer output.Close()
 
-			defer func() {
-				if err := recover(); err != nil {
-					output.Rollback()
-					fmt.Println(err)
-				}
-			}()
+					defer func() {
+						if err := recover(); err != nil {
+							output.Rollback()
+							fmt.Println(err)
+						}
+					}()
 
-			tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(contributingPath)).ParseFiles(tpl)
+					tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(contributingPath)).ParseFiles(tpl)
 
-			if err != nil {
-				panic(err)
+					if err != nil {
+						panic(err)
+					}
+
+					err = tmpl.Execute(output, map[string]any{
+						"ProjectName":  name,
+						"ProjectOwner": owner,
+					})
+					if err != nil {
+						panic(err)
+					}
+
+					if !contributingParameter.disableCopyright {
+						output.Write(COPYRIGHT)
+					}
+				},
 			}
-
-			err = tmpl.Execute(output, map[string]any{
-				"ProjectName":  name,
-				"ProjectOwner": owner,
-			})
-			if err != nil {
-				panic(err)
-			}
-
-			if contributingParameter.copyright {
-				output.Write([]byte(COPYRIGHT))
-			}
+			gen.run()
 		},
 	}
 )
@@ -87,6 +93,7 @@ func init() {
 	docwizCmd.AddCommand(contributingCmd)
 	contributingCmd.PersistentFlags().StringVarP(&contributingParameter.output, "output", "o", "CONTRIBUTING.md", "Path to save the generated contributing file")
 	contributingCmd.PersistentFlags().StringVarP(&contributingParameter.theme, "theme", "t", "default", "Theme for the contributing template")
-	contributingCmd.PersistentFlags().BoolVarP(&contributingParameter.copyright, "copyright", "c", true, "Include copyright information in the contributing")
+	contributingCmd.PersistentFlags().BoolVarP(&contributingParameter.disableCopyright, "disable-copyright", "d", false, "Disable copyright information in the contributing")
 	contributingCmd.PersistentFlags().StringVarP(&contributingParameter.repoPath, "repo", "r", ".", "Path to the target Git repository")
+	contributingCmd.PersistentFlags().StringVarP(&contributingParameter.language, "language", "l", "en_us", "Set the language for contributing file (e.g. zh_cn)")
 }

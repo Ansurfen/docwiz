@@ -35,7 +35,7 @@ There are several ways you can contribute to the project:
 
    - **Run the tests**  
      Ensure all existing tests pass by running the test suite:  
-     `go test ./...`
+     <!-- e.g. `go test ./...` -->
 
    - **Commit your changes**  
      Commit your changes with a clear message and push them to your fork:  

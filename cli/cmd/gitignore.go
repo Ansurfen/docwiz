@@ -103,7 +103,13 @@ You can specify a template directly or pick one interactively.`,
 				if len(gitignoreParameter.output) == 0 {
 					gitignoreParameter.output = ".gitignore"
 				}
-				io.WriteFileFrom(v, gitignoreParameter.output)
+				gen := &generator{
+					output: gitignoreParameter.output,
+					action: func() {
+						io.WriteFileFrom(v, gitignoreParameter.output)
+					},
+				}
+				gen.run()
 			}
 
 			if err != nil {

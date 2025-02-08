@@ -13,13 +13,13 @@
 
 </center>
 
-English | [简体中文](docs/zh_cn/README.md)
+[English](../../README.md) | 简体中文
 
-> DocWiz is a versatile command-line tool that helps generate various types of project documentation like README, LICENSE, ROADMAP, CONTRIBUTORS, and more. It leverages templates and user inputs to create customized and professional documentation files.
+> DocWiz 是一个多功能的命令行工具，可帮助生成各种类型的项目文档，如 README、LICENSE、ROADMAP、CONTRIBUTORS 等。它利用模板和用户输入来创建自定义和专业的文档文件。
 
-## 📦 Install
+## 📦 安装
 
-### build by yourself
+### 自己构建
 ```bash
 git clone git@github.com:Ansurfen/docwiz.git
 cd ./docwiz
@@ -31,19 +31,19 @@ cd ./docwiz
 ./build.sh
 ```
 
-### download
-You can download the binary version [here](https://github.com/Ansurfen/docwiz/releases).
+### 直接下载
+你能够在[这里](https://github.com/Ansurfen/docwiz/releases)下载到二进制版本。
 
-## 🚀 Usage
+## 🚀 使用
 > [!NOTE]
 > The details are viewed using `docwiz -h`
 
 ### readme
-Automatic scanning technology stack generation (✨RECOMMEND)
-![readme_s](./docs/assets/readme_s.gif)
+自动扫描生成技术栈 (✨推荐)
+![readme_s](../assets/readme_s.gif)
 
-Based on TUI to generate
-![readme_s](./docs/assets/readme.gif)
+基于TUI创建
+![readme_s](../assets/readme.gif)
 
 ### changelog
 ```cmd
@@ -56,16 +56,16 @@ docwiz contributors
 ```
 
 ### gitignore
-![gitignore](./docs/assets/gitignore.gif)
+![gitignore](../assets/gitignore.gif)
 
 ### license
-![license](./docs/assets/license.gif)
+![license](../assets/license.gif)
 
 ### commit
-![Commit](./docs/assets/commit.gif)
+![Commit](../assets/commit.gif)
 
 ### copyright
-![copyright](./docs/assets/copyright.gif)
+![copyright](../assets/copyright.gif)
 
 ### roadmap
 ```cmd

@@ -59,5 +59,3 @@ This project is licensed under the [{{.License}}](LICENSE), see [LICENSE](LICENS
 ---
 
 *If you have contributed to this project and don't see your name here, please submit a pull request or contact us to add you!*
-
-_This AUTHORS was generated with 🔥 by [docwiz](https://github.com/ansurfen/docwiz)_

@@ -1,5 +1,7 @@
 # Contributing to Our Project 🚀
 
+English | [简体中文](/docs/zh_cn/CONTRIBUTING.md)
+
 Thank you for considering contributing to our project! 🙌 We are thrilled to have you on board and appreciate your help. Below you'll find the guidelines for contributing to this project.
 
 ## How to Contribute 💻
@@ -8,13 +10,9 @@ There are several ways you can contribute to the project:
 
 1. **Reporting Bugs** 🐞  
    If you encounter a bug, please open an issue on GitHub. Make sure to include as much detail as possible to help us understand the issue.  
-   **Example Issue Template:**  
-   _Insert template for bug report_
 
 2. **Suggesting Features** 💡  
    Have an idea for a new feature or improvement? Please open an issue and describe your suggestion. We would love to hear from you!  
-   **Example Feature Template:**  
-   _Insert template for feature suggestion_
 
 3. **Submitting Code** 🧑‍💻  
    If you're interested in writing code, please follow these steps:

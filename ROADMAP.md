@@ -1,5 +1,7 @@
 # Roadmap 📅
 
+English | [简体中文](/docs/zh_cn/ROADMAP.md)
+
 Our project is evolving and we want to keep track of key milestones. Here's the roadmap for the upcoming releases!
 
 ---

@@ -4,27 +4,63 @@
 package cmd
 
 import (
+	"docwiz/internal/tui"
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
 )
 
-const COPYRIGHT = `
----
+const (
+	version         = "0.0.2"
+	defaultLanguage = "en_us"
+)
 
-_This Markdown was generated with ❤️ by [docwiz](https://github.com/ansurfen/docwiz)_`
-
-var docwizCmd = &cobra.Command{
-	Use:   "docwiz",
-	Short: "🚀 A tool for generating project documentation and related files",
-	Long: `docwiz is a versatile command-line tool that helps generate various types of project documentation 
+var (
+	COPYRIGHT = []byte("\n---\n\n_This Markdown was generated with ❤️ by [docwiz](https://github.com/ansurfen/docwiz)_")
+	docwizCmd = &cobra.Command{
+		Use:   "docwiz",
+		Short: "🚀 A tool for generating project documentation and related files",
+		Long: `docwiz is a versatile command-line tool that helps generate various types of project documentation 
 like README, LICENSE, ROADMAP, CONTRIBUTORS, and more. It leverages templates 
 and user inputs to create customized and professional documentation files.`,
-}
+	}
+)
 
 func Execute() {
 	err := docwizCmd.Execute()
 	if err != nil {
 		os.Exit(1)
 	}
+}
+
+type baseParameter struct {
+	// output specifies the path and filename of the generated output file
+	output string
+
+	// theme defines the theme for the document or UI
+	theme string
+
+	// language sets the language to be used (e.g., "en_us", "zh_cn")
+	//
+	// default: en_us
+	language string
+
+	// disableCopyright determines whether to disable copyright information
+	//
+	// default: false
+	disableCopyright bool
+}
+
+type generator struct {
+	output string
+	action func()
+}
+
+func (g *generator) run() error {
+	err := tui.NewSpinner(g.action, fmt.Sprintf("Generating %s...", g.output)).Run()
+	if err != nil {
+		return err
+	}
+	return tui.NewTextFrame(fmt.Sprintf("%s was successfully generated.\n\nThanks for using docwiz!", g.output)).Run()
 }

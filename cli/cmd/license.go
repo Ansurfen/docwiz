@@ -82,30 +82,36 @@ and year, or select interactively from available licenses.`,
 			if v := index[key]; len(v) != 0 {
 				tpl := filepath.Join(os.TemplatePath, fmt.Sprintf("LICENSE/%s.tpl", v))
 
-				output, err := io.NewSafeFile(licenseParameter.output)
-				if err != nil {
-					panic(err)
-				}
-				defer output.Close()
+				gen := &generator{
+					output: licenseParameter.output,
+					action: func() {
+						output, err := io.NewSafeFile(licenseParameter.output)
+						if err != nil {
+							panic(err)
+						}
+						defer output.Close()
 
-				defer func() {
-					if err := recover(); err != nil {
-						output.Rollback()
-					}
-				}()
+						defer func() {
+							if err := recover(); err != nil {
+								output.Rollback()
+							}
+						}()
 
-				tmpl, err := template.ParseFiles(tpl)
-				if err != nil {
-					panic(err)
-				}
+						tmpl, err := template.ParseFiles(tpl)
+						if err != nil {
+							panic(err)
+						}
 
-				err = tmpl.Execute(output, map[string]any{
-					"Year":   licenseParameter.year,
-					"Author": licenseParameter.author,
-				})
-				if err != nil {
-					panic(err)
+						err = tmpl.Execute(output, map[string]any{
+							"Year":   licenseParameter.year,
+							"Author": licenseParameter.author,
+						})
+						if err != nil {
+							panic(err)
+						}
+					},
 				}
+				gen.run()
 			}
 		},
 	}

@@ -12,11 +12,8 @@ import (
 )
 
 type ContributorsCmdParameter struct {
-	output string
-
+	baseParameter
 	repoPath string
-
-	copyright bool
 }
 
 var (
@@ -28,34 +25,40 @@ var (
 to extract and list all contributors who have committed changes.`,
 		Example: `  docwiz contributors -o CONTRIBUTORS.md
   docwiz contributors -r /path/to/repo -o contributors.txt
-  docwiz contributors --no-copyright`,
+  docwiz contributors --disable-copyright`,
 		Run: func(cmd *cobra.Command, args []string) {
-			output, err := io.NewSafeFile(contributorsParameter.output)
-			if err != nil {
-				panic(err)
-			}
-			defer output.Close()
+			gen := &generator{
+				output: contributorsParameter.output,
+				action: func() {
+					output, err := io.NewSafeFile(contributorsParameter.output)
+					if err != nil {
+						panic(err)
+					}
+					defer output.Close()
 
-			defer func() {
-				if err := recover(); err != nil {
-					output.Rollback()
-					fmt.Println(err)
-				}
-			}()
+					defer func() {
+						if err := recover(); err != nil {
+							output.Rollback()
+							fmt.Println(err)
+						}
+					}()
 
-			r, err := git.New(contributorsParameter.repoPath)
-			if err != nil {
-				panic(err)
-			}
+					r, err := git.New(contributorsParameter.repoPath)
+					if err != nil {
+						panic(err)
+					}
 
-			err = r.GenerateContributors(output)
-			if err != nil {
-				panic(err)
-			}
+					err = r.GenerateContributors(output)
+					if err != nil {
+						panic(err)
+					}
 
-			if contributorsParameter.copyright {
-				output.Write([]byte(COPYRIGHT))
+					if !contributorsParameter.disableCopyright {
+						output.Write(COPYRIGHT)
+					}
+				},
 			}
+			gen.run()
 		},
 	}
 )
@@ -64,5 +67,5 @@ func init() {
 	docwizCmd.AddCommand(contributorsCmd)
 	contributorsCmd.PersistentFlags().StringVarP(&contributorsParameter.output, "output", "o", "CONTRIBUTORS.md", "Path to the output contributors file")
 	contributorsCmd.PersistentFlags().StringVarP(&contributorsParameter.repoPath, "repo", "r", ".", "Path to the target Git repository")
-	contributorsCmd.PersistentFlags().BoolVarP(&contributorsParameter.copyright, "copyright", "c", true, "Include copyright information in the contributors")
+	contributorsCmd.PersistentFlags().BoolVarP(&contributorsParameter.disableCopyright, "disable-copyright", "d", false, "Disable copyright information in the contributors")
 }

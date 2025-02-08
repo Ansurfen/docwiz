@@ -35,7 +35,40 @@ func (*RustWalker) ParseFile(fullpath string, file string, ctx *Context) error {
 	if _, ok := cargoToml.Package.RustVersion.(map[string]any); ok {
 		b.SetVersion(cargoToml.Workspace.Package.RustVersion.(string))
 	} else {
-		b.SetVersion(cargoToml.Package.RustVersion.(string))
+		if v, ok := cargoToml.Package.RustVersion.(string); ok {
+			b.SetVersion(v)
+		}
+	}
+
+	for _, dep := range cargoToml.ProjectDependencies() {
+		b := rustLib.Match(dep.Name(), ctx.stackKind)
+		if b.Badge == nil {
+			continue
+		}
+		if b.Type == useLibVersion {
+			b.Badge.SetVersion(dep.Version())
+		}
+		ctx.Set(b.Name(), upgradeBadge("rust", b))
 	}
 	return nil
 }
+
+var rustLib = &DependencyManager{
+	fullMatches: map[string]badge.Badge{
+		"hyperlane": &badge.BadgeUnion{
+			ShieldBadge: badge.TypedBadge{Type: useLibVersion, Badge: shieldBadgeHyperlane},
+		},
+	},
+}
+
+var (
+	shieldBadgeHyperlane = &badge.ShieldBadge{
+		ID:        "hyperlane",
+		Label:     "hyperlane",
+		Color:     "#dea584",
+		Style:     badge.ShieldStyleDefault,
+		Logo:      "rust",
+		LogoColor: "white",
+		Href:      "https://github.com/ltpp-universe/hyperlane",
+	}
+)

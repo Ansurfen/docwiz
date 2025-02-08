@@ -4,13 +4,9 @@
 package tui
 
 import (
-	"time"
-
 	"github.com/charmbracelet/huh/spinner"
 )
 
-func NewSpinner(duration time.Duration, title string) *spinner.Spinner {
-	return spinner.New().Title(title).Action(func() {
-		time.Sleep(duration)
-	})
+func NewSpinner(action func(), title string) *spinner.Spinner {
+	return spinner.New().Title(title).Action(action)
 }

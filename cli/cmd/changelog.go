@@ -12,9 +12,8 @@ import (
 )
 
 type changelogCmdParameter struct {
-	output    string
-	repoPath  string
-	copyright bool
+	baseParameter
+	repoPath string
 }
 
 var (
@@ -49,8 +48,8 @@ var (
 				panic(err)
 			}
 
-			if changelogParameter.copyright {
-				output.Write([]byte(COPYRIGHT))
+			if !changelogParameter.disableCopyright {
+				output.Write(COPYRIGHT)
 			}
 		},
 	}
@@ -60,5 +59,5 @@ func init() {
 	docwizCmd.AddCommand(changelogCmd)
 	changelogCmd.PersistentFlags().StringVarP(&changelogParameter.output, "output", "o", "CHANGELOG.md", "Path to the output changelog file")
 	changelogCmd.PersistentFlags().StringVarP(&changelogParameter.repoPath, "repository", "r", ".", "Path to the target Git repository")
-	changelogCmd.PersistentFlags().BoolVarP(&changelogParameter.copyright, "copyright", "c", true, "Include copyright information in the changelog")
+	changelogCmd.PersistentFlags().BoolVarP(&changelogParameter.disableCopyright, "disable-copyright", "d", false, "Disable copyright information in the changelog")
 }

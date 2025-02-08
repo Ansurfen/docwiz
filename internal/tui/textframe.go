@@ -20,9 +20,7 @@ func NewTextFrame(content string) *TextFrame {
 
 func (f *TextFrame) Run() error {
 	var sb strings.Builder
-	fmt.Fprintf(&sb,
-		"READEME.md was successfully generated.\n\nThanks for using docwiz!",
-	)
+	fmt.Fprint(&sb, f.content)
 
 	fmt.Println(
 		lipgloss.NewStyle().
