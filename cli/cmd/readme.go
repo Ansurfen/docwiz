@@ -6,12 +6,13 @@ package cmd
 import (
 	"docwiz/internal/git"
 	"docwiz/internal/io"
+	"docwiz/internal/log"
 	"docwiz/internal/os"
-	. "docwiz/internal/template"
+	"docwiz/internal/template"
 	"docwiz/internal/tui"
 	"docwiz/internal/walk"
 	"fmt"
-	"html/template"
+
 	"io/fs"
 	"path/filepath"
 
@@ -118,20 +119,20 @@ theme, and whether to include copyright information.`,
 					output: readmeParameter.output,
 					action: func() {
 
-						tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(tpl)).ParseFiles(tpl)
+						tmpl, err := template.New(tpl).LoadStdlib().Parse()
 						if err != nil {
-							panic(err)
+							log.Fata(err)
 						}
 						output, err := io.NewSafeFile(readmeParameter.output)
 						if err != nil {
-							panic(err)
+							log.Fata(err)
 						}
 						defer output.Close()
 
 						defer func() {
 							if err := recover(); err != nil {
 								output.Rollback()
-								fmt.Println(err)
+								log.Fata(err)
 							}
 						}()
 
@@ -144,7 +145,7 @@ theme, and whether to include copyright information.`,
 						})
 
 						if err != nil {
-							panic(err)
+							log.Fata(err)
 						}
 
 						if !readmeParameter.disableCopyright {
@@ -154,11 +155,11 @@ theme, and whether to include copyright information.`,
 				}
 				gen.run()
 			} else {
-				var language string
-				if len(readmeParameter.language) != 0 {
-					language = readmeParameter.language
+				var chosedTemplate string
+				if len(readmeParameter.template) != 0 {
+					chosedTemplate = readmeParameter.language
 				} else {
-					languages := []string{}
+					templates := []string{}
 					readmePath := filepath.Join(os.TemplatePath, "README")
 					filepath.Walk(readmePath, func(path string, info fs.FileInfo, err error) error {
 						if err != nil {
@@ -169,7 +170,7 @@ theme, and whether to include copyright information.`,
 						}
 						if info.IsDir() {
 							path = filepath.Base(path)
-							languages = append(languages, path)
+							templates = append(templates, path)
 						}
 						return nil
 					})
@@ -178,13 +179,13 @@ theme, and whether to include copyright information.`,
 						Description: "What language is your project based on? (or none)",
 						Placeholder: "Search or press enter to select the language",
 						SelectTitle: "Pick a language",
-						Candicates:  languages,
+						Candicates:  templates,
 					})
 
 					if err := m.Run(); err != nil {
-						panic(err)
+						log.Fata(err)
 					}
-					language = m.Value()
+					chosedTemplate = m.Value()
 				}
 
 				var (
@@ -192,13 +193,13 @@ theme, and whether to include copyright information.`,
 					questions   = tui.DefaultQuestion
 				)
 
-				if language != "none" {
-					templateDir = filepath.Join(templateDir, language)
+				if chosedTemplate != "none" {
+					templateDir = filepath.Join(templateDir, chosedTemplate)
 					var index tui.IndexFile
 
 					err := io.ReadJSON(filepath.Join(templateDir, "index.json"), &index)
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 					questions = append(questions, index.Questions...)
 				}
@@ -207,7 +208,7 @@ theme, and whether to include copyright information.`,
 
 				fmt.Println("🥳 Welcome to use docwiz to create readme.md (use tab to enable default)")
 				if err := m.Run(); err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 
 				gen := &generator{
@@ -218,27 +219,27 @@ theme, and whether to include copyright information.`,
 							tpl = filepath.Join(templateDir, readmeParameter.language, fmt.Sprintf("%s.tpl", readmeParameter.theme))
 						}
 
-						tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(templateDir)).ParseFiles(tpl)
+						tmpl, err := template.New(tpl).LoadStdlib().Parse()
 						if err != nil {
-							panic(err)
+							log.Fata(err)
 						}
 
 						output, err := io.NewSafeFile(readmeParameter.output)
 						if err != nil {
-							panic(err)
+							log.Fata(err)
 						}
 						defer output.Close()
 
 						defer func() {
 							if err := recover(); err != nil {
 								output.Rollback()
-								fmt.Println(err)
+								log.Fata(err)
 							}
 						}()
 
 						err = tmpl.Execute(output, m.Value())
 						if err != nil {
-							panic(err)
+							log.Fata(err)
 						}
 
 						if !readmeParameter.disableCopyright {

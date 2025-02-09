@@ -6,6 +6,7 @@ package template
 import (
 	"fmt"
 	"html/template"
+	"io"
 	"math/rand"
 	"net/url"
 	"path/filepath"
@@ -19,10 +20,42 @@ import (
 	"github.com/Masterminds/sprig/v3"
 )
 
-func DocwizFuncMap(tplPath string) template.FuncMap {
+type DocWizTemplate struct {
+	*template.Template
+	filename string
+}
+
+func Default(tpl string) (*DocWizTemplate, error) {
+	return New(tpl).LoadStdlib().Parse()
+}
+
+func New(tpl string) *DocWizTemplate {
+	return &DocWizTemplate{Template: template.New(filepath.Base(tpl)), filename: tpl}
+}
+
+func (t *DocWizTemplate) LoadStdlib() *DocWizTemplate {
+	t.Funcs(docwizFuncMap(filepath.Dir(t.filename)))
+	return t
+}
+
+func (t *DocWizTemplate) Parse() (*DocWizTemplate, error) {
+	if len(t.filename) != 0 {
+		_, err := t.ParseFiles(t.filename)
+		if err != nil {
+			return t, err
+		}
+	}
+	return t, nil
+}
+
+func (t *DocWizTemplate) Execute(wr io.Writer, data map[string]any) error {
+	return t.Template.Execute(wr, data)
+}
+
+func docwizFuncMap(tplPath string) template.FuncMap {
 	docwizFuncs := sprig.TxtFuncMap()
 
-	docwizFuncs["include"] = includeTemplateFunc(tplPath)
+	docwizFuncs["include"] = include(tplPath)
 	docwizFuncs["notEmpty"] = notEmpty
 	docwizFuncs["parseGitURL"] = parseGitURL
 	docwizFuncs["cat"] = cat
@@ -49,13 +82,13 @@ func DocwizFuncMap(tplPath string) template.FuncMap {
 	return docwizFuncs
 }
 
-func includeTemplateFunc(templateDir string) func(string, interface{}) (string, error) {
+func include(templateDir string) func(string, interface{}) (string, error) {
 	return func(templatePath string, data interface{}) (string, error) {
 		// Parse the included template
 		fullPath := filepath.Join(templateDir, templatePath)
 
 		includedTpl, err := template.New(filepath.Base(templatePath)).
-			Funcs(DocwizFuncMap(filepath.Dir(fullPath))).
+			Funcs(docwizFuncMap(filepath.Dir(fullPath))).
 			ParseFiles(fullPath)
 		if err != nil {
 			return "", err

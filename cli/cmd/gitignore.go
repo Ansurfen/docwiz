@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"docwiz/internal/io"
+	"docwiz/internal/log"
 	"docwiz/internal/os"
 	"docwiz/internal/tui"
 
@@ -72,7 +73,7 @@ You can specify a template directly or pick one interactively.`,
 			})
 
 			if err != nil {
-				panic(err)
+				log.Fata(err)
 			}
 
 			var key string
@@ -93,7 +94,7 @@ You can specify a template directly or pick one interactively.`,
 					Candicates:  gitignores,
 				})
 				if err = m.Run(); err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 
 				key = m.Value()
@@ -113,7 +114,7 @@ You can specify a template directly or pick one interactively.`,
 			}
 
 			if err != nil {
-				panic(err)
+				log.Fata(err)
 			}
 		},
 	}

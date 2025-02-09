@@ -8,9 +8,9 @@ import (
 	"docwiz/internal/io"
 	"docwiz/internal/log"
 	"docwiz/internal/os"
-	. "docwiz/internal/template"
+	"docwiz/internal/template"
 	"fmt"
-	"html/template"
+
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -54,21 +54,21 @@ You can provide information like contribution guidelines, code of conduct, and s
 				action: func() {
 					output, err := io.NewSafeFile(contributingParameter.output)
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 					defer output.Close()
 
 					defer func() {
 						if err := recover(); err != nil {
 							output.Rollback()
-							fmt.Println(err)
+							log.Fata(err)
 						}
 					}()
 
-					tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(contributingPath)).ParseFiles(tpl)
+					tmpl, err := template.New(tpl).LoadStdlib().Parse()
 
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 
 					err = tmpl.Execute(output, map[string]any{
@@ -76,7 +76,7 @@ You can provide information like contribution guidelines, code of conduct, and s
 						"ProjectOwner": owner,
 					})
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 
 					if !contributingParameter.disableCopyright {

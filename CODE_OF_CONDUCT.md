@@ -1,5 +1,7 @@
 # Code of Conduct 📜
 
+English | [简体中文](/docs/zh_cn/CODE_OF_CONDUCT.md)
+
 We are committed to providing a welcoming and inclusive environment for all contributors. By participating in this project, you agree to abide by the following Code of Conduct.
 
 ---

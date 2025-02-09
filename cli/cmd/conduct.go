@@ -5,10 +5,11 @@ package cmd
 
 import (
 	"docwiz/internal/io"
+	"docwiz/internal/log"
 	"docwiz/internal/os"
-	. "docwiz/internal/template"
+	"docwiz/internal/template"
 	"fmt"
-	"html/template"
+
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -40,28 +41,28 @@ which includes guidelines for respectful behavior, inclusivity, and maintaining 
 				action: func() {
 					output, err := io.NewSafeFile(conductParameter.output)
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 					defer output.Close()
 
 					defer func() {
 						if err := recover(); err != nil {
 							output.Rollback()
-							fmt.Println(err)
+							log.Fata(err)
 						}
 					}()
 
-					tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(conductPath)).ParseFiles(tpl)
+					tmpl, err := template.New(tpl).LoadStdlib().Parse()
 
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 
 					err = tmpl.Execute(output, map[string]any{
 						"Email": conductParameter.email,
 					})
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 
 					if conductParameter.disableCopyright {

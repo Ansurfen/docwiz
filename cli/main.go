@@ -5,7 +5,6 @@ package main
 
 import (
 	"docwiz/cli/cmd"
-	_ "docwiz/internal/os"
 )
 
 func main() {

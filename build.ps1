@@ -1,3 +1,7 @@
+# Copyright 2025 The DocWiz Authors. All rights reserved.
+# Use of this source code is governed by a MIT-style
+# license that can be found in the LICENSE file.
+
 function New-DocWiz {
     param (
         [string]$version,
@@ -17,7 +21,8 @@ function New-DocWiz {
     if ($os -eq "windows") {
         go build -o "../docwiz.exe" .
         $exePath = "./docwiz.exe"
-    } else {
+    }
+    else {
         go build -o "../docwiz" .
         $exePath = "./docwiz"
     }
@@ -43,7 +48,8 @@ function New-Package {
     if ($os -eq "windows") {
         # Windows: Create zip file using Compress-Archive
         Compress-Archive -Path "$exePath", ".\template", ".\License" -DestinationPath ".\$packageName.zip"
-    } else {
+    }
+    else {
         # Linux/Darwin: Create tar file using tar
         $tarPath = ".\$packageName.tar"
         tar -cf $tarPath "$exePath" ".\template" ".\License"
@@ -70,9 +76,9 @@ if ([string]::IsNullOrEmpty($version)) {
 
 # Platforms to build for (Windows, Linux, Darwin)
 $platforms = @(
-    @{os="windows"; arch="amd64"},
-    @{os="linux"; arch="amd64"},
-    @{os="darwin"; arch="amd64"}
+    @{os = "windows"; arch = "amd64" },
+    @{os = "linux"; arch = "amd64" },
+    @{os = "darwin"; arch = "amd64" }
 )
 
 foreach ($platform in $platforms) {

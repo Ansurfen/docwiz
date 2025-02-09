@@ -50,6 +50,8 @@ type baseParameter struct {
 	//
 	// default: false
 	disableCopyright bool
+
+	verbose bool
 }
 
 type generator struct {

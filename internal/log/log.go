@@ -9,6 +9,8 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/lipgloss"
@@ -18,31 +20,31 @@ var (
 	errorStyle = lipgloss.NewStyle().
 			SetString("ERROR").
 			Padding(0, 1, 0, 1).
-			Background(lipgloss.Color("#FF5555")).
+			Background(lipgloss.Color("#d251a6")).
 			Foreground(lipgloss.Color("#000000"))
 
 	warnStyle = lipgloss.NewStyle().
 			SetString("WARN").
 			Padding(0, 1, 0, 1).
-			Background(lipgloss.Color("#FFCC00")).
+			Background(lipgloss.Color("#ff7b52")).
 			Foreground(lipgloss.Color("#000000"))
 
 	infoStyle = lipgloss.NewStyle().
 			SetString("INFO").
 			Padding(0, 1, 0, 1).
-			Background(lipgloss.Color("#0096FF")).
+			Background(lipgloss.Color("#00a1e5")).
 			Foreground(lipgloss.Color("#FFFFFF"))
 
 	debugStyle = lipgloss.NewStyle().
 			SetString("DEBUG").
 			Padding(0, 1, 0, 1).
-			Background(lipgloss.Color("#33CC33")).
+			Background(lipgloss.Color("#04b9ae")).
 			Foreground(lipgloss.Color("#000000"))
 
 	fatalStyle = lipgloss.NewStyle().
 			SetString("FATA").
 			Padding(0, 1, 0, 1).
-			Background(lipgloss.Color("#990000")).
+			Background(lipgloss.Color("#c53f3f")).
 			Foreground(lipgloss.Color("#FFFFFF"))
 )
 
@@ -69,6 +71,31 @@ func Fataf(fmt string, a ...any) {
 
 func printf(style lipgloss.Style, format string, a ...any) {
 	fmt.Fprintf(logWriter, style.String()+" "+format, a...)
+}
+
+func Fata(err any) {
+	fmt.Println(fatalStyle, err)
+	print(err, "\n", getStackTrace(1))
+	os.Exit(1)
+}
+
+func print(a ...any) {
+	fmt.Fprint(logWriter, a...)
+}
+
+func getStackTrace(skip int) string {
+	const maxDepth = 32
+	var pcs [maxDepth]uintptr
+
+	n := runtime.Callers(skip+2, pcs[:])
+	frames := runtime.CallersFrames(pcs[:n])
+
+	stacks := []string{}
+
+	for frame, more := frames.Next(); more; frame, more = frames.Next() {
+		stacks = append(stacks, fmt.Sprintf("%s\n  %s:%d\n", frame.Function, frame.File, frame.Line))
+	}
+	return strings.Join(stacks, "")
 }
 
 var logWriter io.Writer = os.Stdout

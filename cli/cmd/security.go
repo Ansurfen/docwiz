@@ -8,9 +8,8 @@ import (
 	"docwiz/internal/io"
 	"docwiz/internal/log"
 	"docwiz/internal/os"
-	. "docwiz/internal/template"
+	"docwiz/internal/template"
 	"fmt"
-	"html/template"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -46,31 +45,31 @@ var (
 			}
 
 			securityPath := filepath.Join(os.TemplatePath, "SECURITY")
-			tpl := filepath.Join(securityPath, fmt.Sprintf("%s.tpl", securityParameter.theme))
 			if securityParameter.language != defaultLanguage {
-				tpl = filepath.Join(securityPath, securityParameter.language, fmt.Sprintf("%s.tpl", securityParameter.theme))
+				securityPath = filepath.Join(securityPath, securityParameter.language)
 			}
+			tpl := filepath.Join(securityPath, fmt.Sprintf("%s.tpl", securityParameter.theme))
 
 			gen := &generator{
 				output: securityParameter.output,
 				action: func() {
 					output, err := io.NewSafeFile(securityParameter.output)
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 					defer output.Close()
 
 					defer func() {
 						if err := recover(); err != nil {
 							output.Rollback()
-							fmt.Println(err)
+							log.Fata(err)
 						}
 					}()
 
-					tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(securityPath)).ParseFiles(tpl)
+					tmpl, err := template.New(tpl).LoadStdlib().Parse()
 
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 
 					err = tmpl.Execute(output, map[string]any{
@@ -79,7 +78,7 @@ var (
 						"Email":        securityParameter.email,
 					})
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 
 					if !securityParameter.disableCopyright {

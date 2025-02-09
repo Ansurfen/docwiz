@@ -37,13 +37,13 @@ It supports inserting content from a file or directly from a string.`,
 		Run: func(cmd *cobra.Command, args []string) {
 			files, err := filepath.Glob(copyrightParameter.pattern)
 			if err != nil {
-				panic(err)
+				log.Fata(err)
 			}
 
 			if len(copyrightParameter.file) != 0 {
 				data, err := os.ReadFile(copyrightParameter.file)
 				if err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 				copyrightParameter.content = string(data)
 			}

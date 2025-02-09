@@ -6,7 +6,7 @@ package cmd
 import (
 	"docwiz/internal/git"
 	"docwiz/internal/io"
-	"fmt"
+	"docwiz/internal/log"
 
 	"github.com/spf13/cobra"
 )
@@ -32,25 +32,25 @@ to extract and list all contributors who have committed changes.`,
 				action: func() {
 					output, err := io.NewSafeFile(contributorsParameter.output)
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 					defer output.Close()
 
 					defer func() {
 						if err := recover(); err != nil {
 							output.Rollback()
-							fmt.Println(err)
+							log.Fata(err)
 						}
 					}()
 
 					r, err := git.New(contributorsParameter.repoPath)
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 
 					err = r.GenerateContributors(output)
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 
 					if !contributorsParameter.disableCopyright {

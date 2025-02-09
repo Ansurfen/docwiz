@@ -4,6 +4,7 @@
 package cmd
 
 import (
+	"docwiz/internal/log"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -43,7 +44,7 @@ var (
 				var user User
 				err := json.Unmarshal([]byte(m), &user)
 				if err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 				maintainers = append(maintainers, user)
 			}
@@ -52,7 +53,7 @@ var (
 				var user User
 				err := json.Unmarshal([]byte(c), &user)
 				if err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 				contributors = append(contributors, user)
 			}
@@ -61,14 +62,14 @@ var (
 				var user User
 				err := json.Unmarshal([]byte(s), &user)
 				if err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 				specialContributors = append(specialContributors, user)
 			}
 
 			execPath, err := os.Executable()
 			if err != nil {
-				panic(err)
+				log.Fata(err)
 			}
 
 			tpl := filepath.Join(execPath, fmt.Sprintf("../template/AUTHORS/%s.tpl", authorsParameter.theme))
@@ -81,13 +82,13 @@ var (
 				action: func() {
 					output, err := os.Create(authorsParameter.output)
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 					defer output.Close()
 
 					tmpl, err := template.ParseFiles(tpl)
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 
 					err = tmpl.Execute(output, map[string]any{
@@ -98,7 +99,7 @@ var (
 						"Copyright":           authorsParameter.disableCopyright,
 					})
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 
 					if !authorsParameter.disableCopyright {

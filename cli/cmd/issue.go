@@ -6,10 +6,10 @@ package cmd
 import (
 	"docwiz/internal/git"
 	"docwiz/internal/io"
+	"docwiz/internal/log"
 	"docwiz/internal/os"
-	. "docwiz/internal/template"
+	"docwiz/internal/template"
 	"fmt"
-	"html/template"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
@@ -73,7 +73,7 @@ and other parameters.`,
 				}
 				repo, err := git.New(issueParameter.repoPath)
 				if err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 				title := "[Bug]: "
 				labels := []string{"bug", "question"}
@@ -102,7 +102,7 @@ and other parameters.`,
 						Value:       "A clear and concise description of what the bug is.",
 					}
 				}
-				issueTmpl := BugReport{
+				issueTmpl := IssueTemplate{
 					Name:        issueParameter.issueName,
 					Description: issueParameter.issueDescription,
 					Title:       title,
@@ -140,19 +140,19 @@ and other parameters.`,
 
 				data, err := yaml.Marshal(&issueTmpl)
 				if err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 
 				output, err := io.NewSafeFile(issueParameter.output)
 				if err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 				defer output.Close()
 
 				defer func() {
 					if err := recover(); err != nil {
 						output.Rollback()
-						fmt.Println(err)
+						log.Fata(err)
 					}
 				}()
 
@@ -166,19 +166,20 @@ and other parameters.`,
 
 				output, err := io.NewSafeFile(issueParameter.output)
 				if err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 				defer output.Close()
 
 				defer func() {
 					if err := recover(); err != nil {
 						output.Rollback()
+						log.Fata(err)
 					}
 				}()
 
-				tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(issuePath)).ParseFiles(tpl)
+				tmpl, err := template.New(tpl).LoadStdlib().Parse()
 				if err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 
 				err = tmpl.Execute(output, map[string]any{
@@ -188,7 +189,7 @@ and other parameters.`,
 				})
 
 				if err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 			}
 		},
@@ -207,7 +208,7 @@ func init() {
 	issueCmd.PersistentFlags().StringVarP(&issueParameter.repoPath, "repo", "r", ".", "Path to the target Git repository (default: current directory)")
 }
 
-type BugReport struct {
+type IssueTemplate struct {
 	Name        string     `yaml:"name"`
 	Description string     `yaml:"description"`
 	Title       string     `yaml:"title"`

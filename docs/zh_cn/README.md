@@ -1,4 +1,4 @@
-<h1 align="center">Welcome to docwiz 👋</h1>
+<h1 align="center">欢迎来到 docwiz 👋</h1>
 <center>
 
 [![BashScript](https://img.shields.io/badge/Bash%20Script-%23121011.svg?logo=gnu-bash&logoColor=white&style=for-the-badge)](https://www.gnu.org/software/bash/) [![Go](https://img.shields.io/badge/Go-1.23-%2300ADD8.svg?logo=go&logoColor=white&style=for-the-badge)](https://golang.org/) [![PowerShell](https://img.shields.io/badge/PowerShell-%235391FE.svg?logo=powershell&logoColor=white&style=for-the-badge)](https://learn.microsoft.com/en-us/powershell/)
@@ -74,13 +74,13 @@ docwiz roadmap
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome.<br />
-Feel free to check [issues page](https://github.com/Ansurfen/docwiz/issues) if you want to contribute.<br />
-[Check the contributing guide](./CONTRIBUTING.md).<br />
+欢迎提出贡献、问题和功能请求。<br />
+如果你想参与贡献，请查看 [issues 页面](https://github.com/Ansurfen/docwiz/issues)。<br />
+[查看贡献指南](./CONTRIBUTING.md).<br />
 
-## 📝 License
+## 📝 许可证
 
-This software is licensed under the MIT license, see [LICENSE](./LICENSE) for more information.
+此软件采用 MIT 许可证，更多信息请参阅 [LICENSE](./LICENSE)。
 
 ---
 

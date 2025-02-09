@@ -5,10 +5,10 @@ package cmd
 
 import (
 	"docwiz/internal/io"
+	"docwiz/internal/log"
 	"docwiz/internal/os"
-	. "docwiz/internal/template"
+	"docwiz/internal/template"
 	"fmt"
-	"html/template"
 
 	"path/filepath"
 
@@ -32,36 +32,38 @@ based on predefined templates and provide information like versioning, kind, the
 		Run: func(cmd *cobra.Command, args []string) {
 			roadMapPath := filepath.Join(os.TemplatePath, "ROADMAP")
 
-			tpl := filepath.Join(roadMapPath, fmt.Sprintf("%s.%s.tpl", roadMapParameter.kind, roadMapParameter.theme))
 			if roadMapParameter.language != defaultLanguage {
-				tpl = filepath.Join(roadMapPath, roadMapParameter.language, fmt.Sprintf("%s.%s.tpl", roadMapParameter.kind, roadMapParameter.theme))
+				roadMapPath = filepath.Join(roadMapPath, roadMapParameter.language)
 			}
+			tpl := filepath.Join(roadMapPath, fmt.Sprintf("%s.%s.tpl", roadMapParameter.kind, roadMapParameter.theme))
+
 			gen := &generator{
 				output: roadMapParameter.output,
 				action: func() {
 					output, err := io.NewSafeFile(roadMapParameter.output)
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 					defer output.Close()
 
 					defer func() {
 						if err := recover(); err != nil {
 							output.Rollback()
+							fmt.Println(err)
 						}
 					}()
 
-					tmpl, err := template.New(filepath.Base(tpl)).Funcs(DocwizFuncMap(roadMapPath)).ParseFiles(tpl)
+					tmpl, err := template.New(tpl).LoadStdlib().Parse()
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 
-					err = tmpl.Execute(output, map[string]string{
+					err = tmpl.Execute(output, map[string]any{
 						"Version": roadMapParameter.data["version"],
 					})
 
 					if err != nil {
-						panic(err)
+						log.Fata(err)
 					}
 
 					if !roadMapParameter.disableCopyright {

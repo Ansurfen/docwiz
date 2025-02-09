@@ -6,7 +6,7 @@ package cmd
 import (
 	"docwiz/internal/git"
 	"docwiz/internal/io"
-	"fmt"
+	"docwiz/internal/log"
 
 	"github.com/spf13/cobra"
 )
@@ -27,25 +27,25 @@ var (
 		Run: func(cmd *cobra.Command, args []string) {
 			output, err := io.NewSafeFile(changelogParameter.output)
 			if err != nil {
-				panic(err)
+				log.Fata(err)
 			}
 			defer output.Close()
 
 			defer func() {
 				if err := recover(); err != nil {
 					output.Rollback()
-					fmt.Println(err)
+					log.Fata(err)
 				}
 			}()
 
 			r, err := git.New(changelogParameter.repoPath)
 			if err != nil {
-				panic(err)
+				log.Fata(err)
 			}
 
 			err = r.GenerateChangelog(output)
 			if err != nil {
-				panic(err)
+				log.Fata(err)
 			}
 
 			if !changelogParameter.disableCopyright {

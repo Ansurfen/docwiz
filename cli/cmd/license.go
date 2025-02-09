@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"docwiz/internal/io"
+	"docwiz/internal/log"
 	"docwiz/internal/os"
 	"docwiz/internal/tui"
 	"fmt"
@@ -51,7 +52,7 @@ and year, or select interactively from available licenses.`,
 
 			err := io.ReadJSON(indexFile, &index)
 			if err != nil {
-				panic(err)
+				log.Fata(err)
 			}
 
 			var key string
@@ -74,7 +75,7 @@ and year, or select interactively from available licenses.`,
 				})
 
 				if err = m.Run(); err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 				key = m.Value()
 			}
@@ -94,12 +95,13 @@ and year, or select interactively from available licenses.`,
 						defer func() {
 							if err := recover(); err != nil {
 								output.Rollback()
+								log.Fata(err)
 							}
 						}()
 
 						tmpl, err := template.ParseFiles(tpl)
 						if err != nil {
-							panic(err)
+							log.Fata(err)
 						}
 
 						err = tmpl.Execute(output, map[string]any{
@@ -107,7 +109,7 @@ and year, or select interactively from available licenses.`,
 							"Author": licenseParameter.author,
 						})
 						if err != nil {
-							panic(err)
+							log.Fata(err)
 						}
 					},
 				}

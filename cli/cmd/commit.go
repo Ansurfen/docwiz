@@ -4,6 +4,7 @@
 package cmd
 
 import (
+	"docwiz/internal/log"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -34,17 +35,17 @@ enhancing the commit message with relevant emojis based on predefined mappings.`
 		Run: func(cmd *cobra.Command, args []string) {
 			execPath, err := os.Executable()
 			if err != nil {
-				panic(err)
+				log.Fata(err)
 			}
 			index := filepath.Join(execPath, "../template/COMMIT/index.json")
 			data, err := os.ReadFile(index)
 			if err != nil {
-				panic(err)
+				log.Fata(err)
 			}
 
 			err = json.Unmarshal(data, &emojiMap)
 			if err != nil {
-				panic(err)
+				log.Fata(err)
 			}
 
 			msg := addGitEmoji(commitParameter.message)
@@ -57,7 +58,7 @@ enhancing the commit message with relevant emojis based on predefined mappings.`
 				cmd.Stderr = os.Stderr
 
 				if err = cmd.Run(); err != nil {
-					panic(err)
+					log.Fata(err)
 				}
 				return
 			}
