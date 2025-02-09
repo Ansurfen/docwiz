@@ -15,7 +15,7 @@
 {{- if gt (len .Profile) 0}}
 _{{- .Profile -}}_
 {{- end}}
-{{- range $key, $value := .Data}}
+{{- range $key, $value := .Others}}
   - {{$key}}: {{$value}}
 {{- end}}
 {{- end}}
@@ -30,7 +30,7 @@ _{{- .Profile -}}_
 {{- if gt (len .Profile) 0}}
 _{{- .Profile -}}_
 {{- end}}
-{{- range $key, $value := .Data}}
+{{- range $key, $value := .Others}}
   - {{$key}}: {{$value}}
 {{- end}}
 {{- end}}
@@ -46,7 +46,7 @@ _{{- .Profile -}}_
 {{- if gt (len .Profile) 0}}
 _{{- .Profile -}}_
 {{- end}}
-{{- range $key, $value := .Data}}
+{{- range $key, $value := .Others}}
   - {{$key}}: {{$value}}
 {{- end}}
 {{- end}}

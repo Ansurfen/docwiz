@@ -19,9 +19,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// readmeCmdParameter stores the parameters for the "readme" command.
 type readmeCmdParameter struct {
 	baseParameter
-	scan     bool
+
+	// scan indicates whether to automatically scan and generate the README file.
+	// If true, it will scan the project and generate the README.
+	scan bool
+
+	// template defines the programming language template for the README.
+	// It is used to determine which template should be applied when generating the README file.
 	template string
 }
 

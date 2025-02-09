@@ -34,6 +34,7 @@ func Execute() {
 	}
 }
 
+// baseParameter contains shared parameters across multiple commands.
 type baseParameter struct {
 	// output specifies the path and filename of the generated output file
 	output string
@@ -66,3 +67,13 @@ func (g *generator) run() error {
 	}
 	return tui.NewTextFrame(fmt.Sprintf("%s was successfully generated.\n\nThanks for using docwiz!", g.output)).Run()
 }
+
+// todo
+// func assert(err any, verbose bool) {
+// 	if err != nil {
+// 		if verbose {
+// 			panic(err)
+// 		}
+// 		log.Fata(err)
+// 	}
+// }

@@ -52,7 +52,7 @@ which includes guidelines for respectful behavior, inclusivity, and maintaining 
 						}
 					}()
 
-					tmpl, err := template.New(tpl).LoadStdlib().Parse()
+					tmpl, err := template.Default(tpl)
 
 					if err != nil {
 						log.Fata(err)

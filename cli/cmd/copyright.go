@@ -15,12 +15,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// copyrightCmdParameter stores parameters for the "copyright" command.
 type copyrightCmdParameter struct {
-	pattern    string
+	// pattern defines the file search pattern to locate target files.
+	// Example patterns: "*.go", "src/*.js", "**/*.md".
+	pattern string
+
+	// tailInsert determines whether to insert the copyright notice at the end of the file.
+	// If false, the notice is inserted at the beginning of the file.
 	tailInsert bool
-	file       string
-	content    string
-	repeat     bool
+
+	// file specifies the path to a file containing the copyright notice.
+	// If provided, its content will be used instead of the --content flag.
+	file string
+
+	// content holds the copyright notice text to be inserted.
+	// If both --file and --content are provided, --file takes precedence.
+	content string
+
+	// repeat controls whether the copyright notice can be inserted multiple times.
+	// If false, it ensures that the notice is added only once per file.
+	repeat bool
 }
 
 var (

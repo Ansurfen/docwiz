@@ -65,7 +65,7 @@ You can provide information like contribution guidelines, code of conduct, and s
 						}
 					}()
 
-					tmpl, err := template.New(tpl).LoadStdlib().Parse()
+					tmpl, err := template.Default(tpl)
 
 					if err != nil {
 						log.Fata(err)

@@ -15,10 +15,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// commitCmdParameter stores parameters related to the "commit" command.
 type commitCmdParameter struct {
+	// message is the commit message provided by the user.
+	// It can include a conventional commit prefix, such as "feat:", "fix:", or "docs:".
 	message string
-	pure    bool
-	exec    bool
+
+	// pure determines whether to output only the processed commit message
+	// without executing the git commit command.
+	// If set to true, the formatted message is printed instead of being committed.
+	pure bool
+
+	// exec specifies whether to execute the "git commit" command directly.
+	// If set to true, the command is run using "git commit -m <message>".
+	exec bool
 }
 
 var (

@@ -13,7 +13,7 @@ The maintainers are responsible for the overall health of the project, including
 {{- if gt (len .Profile) 0}}
 _{{- .Profile -}}_
 {{- end}}
-{{- range $key, $value := .Data}}
+{{- range $key, $value := .Others}}
   - {{$key}}: {{$value}}
 {{- end}}
 {{- end}}
@@ -28,7 +28,7 @@ These are the awesome people who have contributed code, features, or bug fixes t
 {{- if gt (len .Profile) 0}}
 _{{- .Profile -}}_
 {{- end}}
-{{- range $key, $value := .Data}}
+{{- range $key, $value := .Others}}
   - {{$key}}: {{$value}}
 {{- end}}
 {{- end}}
@@ -44,7 +44,7 @@ A big thank you to those who provided invaluable support and resources for this 
 {{- if gt (len .Profile) 0}}
 _{{- .Profile -}}_
 {{- end}}
-{{- range $key, $value := .Data}}
+{{- range $key, $value := .Others}}
   - {{$key}}: {{$value}}
 {{- end}}
 {{- end}}

@@ -16,22 +16,53 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// issueCmdParameter stores the parameters for the "issue" command.
 type issueCmdParameter struct {
-	issueName        string
+	// issueName defines the name of the issue (e.g., "Bug report", "Feature request").
+	// If not provided, the name defaults based on the issue kind.
+	issueName string
+
+	// issueDescription contains the description of the issue, providing details on the problem or feature.
+	// If not provided, a default description is set based on the issue kind.
 	issueDescription string
-	issueAssigness   string
-	output           string
-	theme            string
-	kind             string
-	format           string
-	repoPath         string
+
+	// issueAssigness is a comma-separated list of assignees for the issue.
+	// It specifies who is responsible for addressing the issue.
+	issueAssigness string
+
+	// output defines the output file where the generated issue template will be saved.
+	// Defaults to "ISSUE.md" for Markdown or "ISSUE.yaml" for YAML, depending on the format.
+	output string
+
+	// theme specifies the theme for the issue template rendering, which influences the layout and structure of the generated file.
+	// The default theme is "default".
+	theme string
+
+	// kind defines the type of the issue (e.g., "bug" or "feature").
+	// It determines the structure and labels of the issue template.
+	kind string
+
+	// format specifies the format of the generated issue template.
+	// It can be either "md" for Markdown or "yaml" for YAML.
+	format string
+
+	// repoPath specifies the path to the Git repository, from which information like tags will be gathered.
+	// The default value is the current directory ("./").
+	repoPath string
 }
 
+// Constants for the issue format and type.
 const (
+	// issueFormatMarkdown represents the Markdown format for the issue template.
 	issueFormatMarkdown = "md"
-	issueForamtYAML     = "yaml"
 
-	issueKindBug     = "bug"
+	// issueForamtYAML represents the YAML format for the issue template.
+	issueForamtYAML = "yaml"
+
+	// issueKindBug represents a bug report issue.
+	issueKindBug = "bug"
+
+	// issueKindFeature represents a feature request issue.
 	issueKindFeature = "feature"
 )
 
@@ -177,7 +208,7 @@ and other parameters.`,
 					}
 				}()
 
-				tmpl, err := template.New(tpl).LoadStdlib().Parse()
+				tmpl, err := template.Default(tpl)
 				if err != nil {
 					log.Fata(err)
 				}

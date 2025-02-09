@@ -4,12 +4,14 @@
 package cmd
 
 import (
+	"docwiz/internal/io"
 	"docwiz/internal/log"
-	"encoding/json"
+	"docwiz/internal/os"
+	"docwiz/internal/template"
 	"fmt"
-	"html/template"
-	"os"
+
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -21,10 +23,16 @@ type authorsCmdParameter struct {
 	// The type of license (e.g., MIT, Apache, etc.)
 	license string
 
+	// maintainers is a list of primary maintainers responsible for overseeing the project.
+	// They have authority over major decisions, code reviews, and releases.
 	maintainers []string
 
+	// contributors is a list of individuals who have contributed to the project
+	// through code, documentation, or other improvements.
 	contributors []string
 
+	// specialContributors is a list of individuals who have made significant or
+	// notable contributions to the project, such as funding, mentorship, or key features.
 	specialContributors []string
 }
 
@@ -35,14 +43,13 @@ var (
 		Short: "Generate an AUTHORS file with maintainers and contributors.",
 		Long: `The 'authors' command generates an AUTHORS file that includes 
 		maintainers, contributors, and special contributors based on the provided details.`,
-		Example: `  docwiz authors -o AUTHORS.md -t default -m '{"name":"Alice","duty":"Lead Developer"}' \
-	-c '{"name":"Bob","duty":"Contributor"}' -s '{"name":"Charlie","duty":"Special Contributor"}'`,
+		Example: `  docwiz authors -o AUTHORS.md authors -m 'name=Alice,duty="Lead Developer"'
+    -c 'name=Bob,duty="Contributor"' -s 'name=Charlie,duty="Special Contributor"'`,
 		Run: func(cmd *cobra.Command, args []string) {
-			var maintainers, contributors, specialContributors []User
+			var maintainers, contributors, specialContributors []user
 
 			for _, m := range authorsParameter.maintainers {
-				var user User
-				err := json.Unmarshal([]byte(m), &user)
+				user, err := unmarshalUser(m)
 				if err != nil {
 					log.Fata(err)
 				}
@@ -50,8 +57,7 @@ var (
 			}
 
 			for _, c := range authorsParameter.contributors {
-				var user User
-				err := json.Unmarshal([]byte(c), &user)
+				user, err := unmarshalUser(c)
 				if err != nil {
 					log.Fata(err)
 				}
@@ -59,34 +65,37 @@ var (
 			}
 
 			for _, s := range authorsParameter.specialContributors {
-				var user User
-				err := json.Unmarshal([]byte(s), &user)
+				user, err := unmarshalUser(s)
 				if err != nil {
 					log.Fata(err)
 				}
 				specialContributors = append(specialContributors, user)
 			}
 
-			execPath, err := os.Executable()
-			if err != nil {
-				log.Fata(err)
+			authrosPath := filepath.Join(os.TemplatePath, "AUTHORS")
+			if authorsParameter.language != defaultLanguage {
+				authrosPath = filepath.Join(os.TemplatePath, "AUTHORS", authorsParameter.language)
 			}
 
-			tpl := filepath.Join(execPath, fmt.Sprintf("../template/AUTHORS/%s.tpl", authorsParameter.theme))
-			if authorsParameter.language != defaultLanguage {
-				tpl = filepath.Join(execPath, authorsParameter.language, fmt.Sprintf("../template/AUTHORS/%s.tpl", authorsParameter.theme))
-			}
+			tpl := filepath.Join(authrosPath, fmt.Sprintf("%s.tpl", authorsParameter.theme))
 
 			gen := &generator{
 				output: authorsParameter.output,
 				action: func() {
-					output, err := os.Create(authorsParameter.output)
+					output, err := io.NewSafeFile(authorsParameter.output)
 					if err != nil {
 						log.Fata(err)
 					}
 					defer output.Close()
 
-					tmpl, err := template.ParseFiles(tpl)
+					defer func() {
+						if err := recover(); err != nil {
+							output.Rollback()
+							log.Fata(err)
+						}
+					}()
+
+					tmpl, err := template.Default(tpl)
 					if err != nil {
 						log.Fata(err)
 					}
@@ -125,17 +134,80 @@ func init() {
 	authorsCmd.PersistentFlags().StringArrayVarP(&authorsParameter.specialContributors, "special-contributors", "s", []string{}, "List of special contributors in JSON format")
 	authorsCmd.PersistentFlags().BoolVarP(&authorsParameter.disableCopyright, "disable-copyright", "d", false, "Disable copyright information in the authors")
 	authorsCmd.PersistentFlags().StringVarP(&authorsParameter.language, "language", "l", "en_us", "Set the language for contributing file (e.g. zh_cn)")
+	authorsCmd.PersistentFlags().BoolVarP(&authorsParameter.verbose, "verbose", "v", false, "")
 }
 
-type User struct {
-	Name     string `json:"name"`
-	Duty     string `json:"duty"`
-	HomePage string `json:"homePage"`
-	Profile  string `json:"profile"`
+// parse key=value to map
+func unmarshal(v string) (map[string]string, error) {
+	result := make(map[string]string)
+	pairs := strings.Split(v, ",")
 
-	// personal account (true); a business or institution (false)
-	IsIndividual bool `json:"isIndividual"`
+	for _, pair := range pairs {
+		kv := strings.SplitN(pair, "=", 2)
+		if len(kv) != 2 {
+			return nil, fmt.Errorf("invalid format: %s", pair)
+		}
 
-	//
-	Data map[string]string
+		key := strings.TrimSpace(kv[0])
+		value := strings.TrimSpace(kv[1])
+
+		if strings.HasPrefix(value, "\"") && strings.HasSuffix(value, "\"") {
+			value = strings.Trim(value, "\"")
+		}
+
+		result[key] = value
+	}
+
+	return result, nil
+}
+
+func unmarshalUser(v string) (user, error) {
+	u := user{IsIndividual: false, Others: make(map[string]string)}
+	data, err := unmarshal(v)
+	if err != nil {
+		return u, err
+	}
+
+	for k, v := range data {
+		switch k {
+		case "name":
+			u.Name = v
+		case "duty":
+			u.Duty = v
+		case "homepage":
+			u.HomePage = v
+		case "profile":
+			u.Profile = v
+		case "isIndividual":
+			if v == "true" {
+				u.IsIndividual = true
+			}
+		default:
+			u.Others[k] = v
+		}
+	}
+	return u, nil
+}
+
+// user represents an individual or an entity that is a contributor or maintainer in the project.
+// It includes personal information such as name, duty, and profile, and allows for customization
+// with additional fields like homepage and other metadata.
+type user struct {
+	// Name holds the name of the user (contributor or maintainer).
+	Name string
+
+	// Duty represents the role or responsibility of the user in the project (e.g., "Lead Developer").
+	Duty string
+
+	// HomePage is a link to the user's personal or project website.
+	HomePage string
+
+	// Profile contains the link to the user's profile, like a GitHub or LinkedIn profile.
+	Profile string
+
+	// IsIndividual indicates whether the user is an individual (true) or an organization/entity (false).
+	IsIndividual bool
+
+	// Others holds any additional metadata about the user that doesn't fit into the predefined fields.
+	Others map[string]string
 }

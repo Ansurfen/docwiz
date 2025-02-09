@@ -72,7 +72,7 @@ docwiz contributors
 docwiz roadmap
 ```
 
-## 🤝 Contributing
+## 🤝 贡献
 
 欢迎提出贡献、问题和功能请求。<br />
 如果你想参与贡献，请查看 [issues 页面](https://github.com/Ansurfen/docwiz/issues)。<br />
@@ -80,7 +80,7 @@ docwiz roadmap
 
 ## 📝 许可证
 
-此软件采用 MIT 许可证，更多信息请参阅 [LICENSE](./LICENSE)。
+此软件采用 MIT 许可证，更多信息请参阅 [LICENSE](../../LICENSE)。
 
 ---
 

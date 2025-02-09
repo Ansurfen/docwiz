@@ -17,11 +17,18 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// gitignoreCmdParameter stores parameters for the "gitignore" command.
 type gitignoreCmdParameter struct {
-	output   string
+	// output specifies the path where the generated .gitignore file should be saved.
+	// If not provided, the default output path is ".gitignore".
+	output string
+
+	// template defines the predefined .gitignore template to use.
+	// Example values: "Go", "Python", "Node". If set to "none", no template is used.
 	template string
 }
 
+// NoneGitignore represents the option to not use any predefined .gitignore template.
 const NoneGitignore = "none"
 
 var (

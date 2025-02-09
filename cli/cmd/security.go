@@ -66,7 +66,7 @@ var (
 						}
 					}()
 
-					tmpl, err := template.New(tpl).LoadStdlib().Parse()
+					tmpl, err := template.Default(tpl)
 
 					if err != nil {
 						log.Fata(err)
