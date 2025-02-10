@@ -4,41 +4,66 @@
 package walk
 
 import (
-	"docwiz/internal/badge"
+	"docwiz/internal/cfg"
+	"errors"
 	"strings"
 )
 
-type DependencyManager struct {
-	partialMatches map[string]badge.Badge
-	fullMatches    map[string]badge.Badge
-	fuzzyMatches   map[string]badge.Badge
+type ResolverPattern map[string]ExtendedBadge
+
+type DependencyResolver struct {
+	Partial ResolverPattern
+	Full    ResolverPattern
+	Fuzzy   ResolverPattern
 }
 
-func (w *DependencyManager) Match(name string, kind BadgeKind) badge.TypedBadge {
-	var ret badge.Badge
-	if v, ok := w.fullMatches[name]; ok {
+func (w *DependencyResolver) Match(name string) ExtendedBadge {
+	var ret ExtendedBadge
+	if v, ok := w.Full[name]; ok {
 		ret = v
 		goto handle
 	}
-	for k, v := range w.partialMatches {
+	for k, v := range w.Partial {
 		if strings.HasPrefix(name, k) {
 			ret = v
 			goto handle
 		}
 	}
-	for k, v := range w.fuzzyMatches {
+	for k, v := range w.Fuzzy {
 		if strings.Contains(name, k) {
 			ret = v
 			goto handle
 		}
 	}
 handle:
-	if ret != nil {
-		union := ret.(*badge.BadgeUnion)
-		if kind == BadgeKindShield {
-			return union.ShieldBadge
+	return ret
+}
+
+func ResolveDependency(ctx *Context, resolvers map[BadgeKind]*DependencyResolver, cfg cfg.Configure, tag string) error {
+	if resolver, ok := resolvers[ctx.StackBadgeKind()]; ok {
+		for _, dep := range cfg.ProjectDependencies() {
+			eb := resolver.Match(dep.Name())
+			if eb != nil {
+				b := eb.Unwrap()
+				if eb.Kind() == ExtraInfoUseUseDependencyVersion {
+					b.SetVersion(dep.Version())
+				}
+				ctx.Set(b.Name(), UpgradeBadge(tag, b))
+			}
 		}
-		return union.BadgenBadge
+
+		for _, dep := range cfg.ProjectDevDependencies() {
+			eb := resolver.Match(dep.Name())
+			if eb != nil {
+				b := eb.Unwrap()
+				if eb.Kind() == ExtraInfoUseUseDependencyVersion {
+					b.SetVersion(dep.Version())
+				}
+				ctx.Set(b.Name(), UpgradeBadge(tag, b))
+			}
+		}
+		return nil
 	}
-	return badge.TypedBadge{}
+
+	return errors.New("invalid resolver")
 }

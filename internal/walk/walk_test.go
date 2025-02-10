@@ -5,13 +5,14 @@ package walk_test
 
 import (
 	"docwiz/internal/walk"
+	gowalk "docwiz/internal/walk/go"
 	"testing"
 )
 
 func TestWalk(t *testing.T) {
 	walk.Walk(".", &walk.Context{
 		Walkers: []walk.Walker{
-			&walk.GoWalker{},
+			&gowalk.Walker{},
 		},
 	})
 }

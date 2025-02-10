@@ -11,6 +11,60 @@ import (
 	"docwiz/internal/template"
 	"docwiz/internal/tui"
 	"docwiz/internal/walk"
+	androidwalk "docwiz/internal/walk/android"
+	bashwalk "docwiz/internal/walk/bash"
+	cwalk "docwiz/internal/walk/c"
+	clojurewalk "docwiz/internal/walk/clojure"
+	cmakewalk "docwiz/internal/walk/cmake"
+	cppwalk "docwiz/internal/walk/cpp"
+	crystalwalk "docwiz/internal/walk/crystal"
+	csharpwalk "docwiz/internal/walk/csharp"
+	csswalk "docwiz/internal/walk/css"
+	cudawalk "docwiz/internal/walk/cuda"
+	dartwalk "docwiz/internal/walk/dart"
+	dockerwalk "docwiz/internal/walk/docker"
+	elixirwalk "docwiz/internal/walk/elixir"
+	elmwalk "docwiz/internal/walk/elm"
+	erlangwalk "docwiz/internal/walk/erlang"
+	fortranwalk "docwiz/internal/walk/fortran"
+	gdscriptwalk "docwiz/internal/walk/gdscript"
+	gitwalk "docwiz/internal/walk/git"
+	gowalk "docwiz/internal/walk/go"
+	gradlewalk "docwiz/internal/walk/gradle"
+	graphqlwalk "docwiz/internal/walk/graphql"
+	groovywalk "docwiz/internal/walk/groovy"
+	haskellwalk "docwiz/internal/walk/haskell"
+	htmlwalk "docwiz/internal/walk/html"
+	javawalk "docwiz/internal/walk/java"
+	jswalk "docwiz/internal/walk/js"
+	jspwalk "docwiz/internal/walk/jsp"
+	juliawalk "docwiz/internal/walk/julia"
+	jupyterwalk "docwiz/internal/walk/jupyter"
+	kotlinwalk "docwiz/internal/walk/kotlin"
+	latexwalk "docwiz/internal/walk/latex"
+	luawalk "docwiz/internal/walk/lua"
+	mdwalk "docwiz/internal/walk/md"
+	nimwalk "docwiz/internal/walk/nim"
+	nixwalk "docwiz/internal/walk/nix"
+	objectivecwalk "docwiz/internal/walk/oc"
+	ocamlwalk "docwiz/internal/walk/ocaml"
+	perlwalk "docwiz/internal/walk/perl"
+	phpwalk "docwiz/internal/walk/php"
+	powershellwalk "docwiz/internal/walk/powershell"
+	pythonwalk "docwiz/internal/walk/python"
+	qtwalk "docwiz/internal/walk/qt"
+	rwalk "docwiz/internal/walk/r"
+	rescriptwalk "docwiz/internal/walk/rescript"
+	rubywalk "docwiz/internal/walk/ruby"
+	rustwalk "docwiz/internal/walk/rust"
+	scalawalk "docwiz/internal/walk/scala"
+	soliditywalk "docwiz/internal/walk/solidity"
+	swiftwalk "docwiz/internal/walk/swift"
+	tswalk "docwiz/internal/walk/ts"
+	vscodewalk "docwiz/internal/walk/vscode"
+	yamlwalk "docwiz/internal/walk/yaml"
+	yarnwalk "docwiz/internal/walk/yarn"
+	zigwalk "docwiz/internal/walk/zig"
 	"fmt"
 
 	"io/fs"
@@ -64,60 +118,60 @@ theme, and whether to include copyright information.`,
 					Output:   readmeParameter.output,
 					Template: tpl,
 					Walkers: []walk.Walker{
-						&walk.AndroidWalker{},
-						&walk.BashWalker{},
-						&walk.CWalker{},
-						&walk.ClojureWalker{},
-						&walk.CMakeWalker{},
-						&walk.CPPWalker{},
-						&walk.CrystalWalker{},
-						&walk.CSharpWalker{},
-						&walk.CSSWalker{},
-						&walk.CudaWalker{},
-						&walk.DartWalker{},
-						&walk.DockerWalker{},
-						&walk.ElixirWalker{},
-						&walk.ElmWalker{},
-						&walk.ErlangWalker{},
-						&walk.FortranWalker{},
-						&walk.GDScriptWalker{},
-						&walk.GitWalker{},
-						&walk.GoWalker{},
-						&walk.GradleWalker{},
-						&walk.GraphQLWalker{},
-						&walk.GroovyWalker{},
-						&walk.HaskellWalker{},
-						&walk.HTMLWalker{},
-						&walk.JavaWalker{},
-						&walk.JavaScriptWalker{},
-						&walk.JSPWalker{},
-						&walk.JuliaWalker{},
-						&walk.JupyterWalker{},
-						&walk.KotlinWalker{},
-						&walk.LaTeXWalker{},
-						&walk.LuaWalker{},
-						&walk.MarkdownWalker{},
-						&walk.NimWalker{},
-						&walk.NixWalker{},
-						&walk.ObjectiveCWalker{},
-						&walk.OCamlWalker{},
-						&walk.PerlWalker{},
-						&walk.PHPWalker{},
-						&walk.PowerShellWalker{},
-						&walk.PythonWalker{},
-						&walk.QTWalker{},
-						&walk.RWaler{},
-						&walk.ReScriptWalker{},
-						&walk.RubyWalker{},
-						&walk.RustWalker{},
-						&walk.ScalaWalker{},
-						&walk.SolidityWalker{},
-						&walk.SwiftWalker{},
-						&walk.TypeScriptWalker{},
-						&walk.VSCodeWalker{},
-						&walk.YAMLWalker{},
-						&walk.YarnWalker{},
-						&walk.ZigWalker{},
+						&androidwalk.Walker{},
+						&bashwalk.Walker{},
+						&cwalk.Walker{},
+						&clojurewalk.Walker{},
+						&cmakewalk.Walker{},
+						&cppwalk.Walker{},
+						&crystalwalk.Walker{},
+						&csharpwalk.Walker{},
+						&csswalk.Walker{},
+						&cudawalk.Walker{},
+						&dartwalk.Walker{},
+						&dockerwalk.Walker{},
+						&elixirwalk.Walker{},
+						&elmwalk.Walker{},
+						&erlangwalk.Walker{},
+						&fortranwalk.Walker{},
+						&gdscriptwalk.Walker{},
+						&gitwalk.Walker{},
+						&gowalk.Walker{},
+						&gradlewalk.Walker{},
+						&graphqlwalk.Walker{},
+						&groovywalk.Walker{},
+						&haskellwalk.Walker{},
+						&htmlwalk.Walker{},
+						&javawalk.Walker{},
+						&jswalk.Walker{},
+						&jspwalk.Walker{},
+						&juliawalk.Walker{},
+						&jupyterwalk.Walker{},
+						&kotlinwalk.Walker{},
+						&latexwalk.Walker{},
+						&luawalk.Walker{},
+						&mdwalk.Walker{},
+						&nimwalk.Walker{},
+						&nixwalk.Walker{},
+						&objectivecwalk.Walker{},
+						&ocamlwalk.Walker{},
+						&perlwalk.Walker{},
+						&phpwalk.Walker{},
+						&powershellwalk.Walker{},
+						&pythonwalk.Walker{},
+						&qtwalk.Walker{},
+						&rwalk.Walker{},
+						&rescriptwalk.Walker{},
+						&rubywalk.Walker{},
+						&rustwalk.Walker{},
+						&scalawalk.Walker{},
+						&soliditywalk.Walker{},
+						&swiftwalk.Walker{},
+						&tswalk.Walker{},
+						&vscodewalk.Walker{},
+						&yamlwalk.Walker{},
+						&yarnwalk.Walker{},
+						&zigwalk.Walker{},
 					},
 				}
 				walk.Walk(".", ctx)

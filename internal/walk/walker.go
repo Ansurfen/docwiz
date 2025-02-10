@@ -54,6 +54,10 @@ type Context struct {
 	Sections       []Section
 }
 
+func (c *Context) StackBadgeKind() BadgeKind {
+	return c.stackKind
+}
+
 type Section struct {
 	Title       string
 	Description string
@@ -165,6 +169,42 @@ func Walk(root string, ctx *Context) error {
 	return nil
 }
 
-func upgradeBadge(tag string, b badge.Badge) badge.SortableBadge {
+func UpgradeBadge(tag string, b badge.Badge) badge.SortableBadge {
 	return badge.SortableBadge{Tag: tag, Badge: b}
+}
+
+type ExtraInfo int
+
+type ExtendedBadge interface {
+	Kind() ExtraInfo
+	Unwrap() badge.Badge
+}
+
+const (
+	ExtraInfoNone = iota
+	ExtraInfoUseUseDependencyVersion
+)
+
+type DependencyVersionBadge struct {
+	badge.Badge
+}
+
+func (DependencyVersionBadge) Kind() ExtraInfo {
+	return ExtraInfoUseUseDependencyVersion
+}
+
+func (b DependencyVersionBadge) Unwrap() badge.Badge {
+	return b.Badge
+}
+
+type SystemVersionBadge struct {
+	badge.Badge
+}
+
+func (SystemVersionBadge) Kind() ExtraInfo {
+	return ExtraInfoNone
+}
+
+func (b SystemVersionBadge) Unwrap() badge.Badge {
+	return b.Badge
 }

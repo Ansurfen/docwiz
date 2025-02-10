@@ -55,6 +55,11 @@ func (b *ShieldBadge) URL() string {
 	sb.WriteString(".svg")
 
 	params := url.Values{}
+
+	if len(b.Style) == 0 {
+		b.Style = ShieldStyleDefault
+	}
+
 	if b.Style != "" {
 		params.Set("style", url.QueryEscape(b.Style))
 	}

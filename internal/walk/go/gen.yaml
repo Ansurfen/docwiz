@@ -1,0 +1,27 @@
+walker:
+  subscribe:
+    ext: [".go", ".sum"]
+    file: ["go.mod", "go.sum"]
+  callback:
+    ext:
+
+    file:
+      - match: "go.mod"
+
+      - match: "go.sum"
+resolver:
+  - name: github.com/gin-gonic/gin
+    match: full
+    badge: Gin
+badges:
+  shield:
+    - id: Gin
+      label: Gin
+      color: "#ffffff"
+      logo: go
+      logoColor: blue
+      href: "https://github.com/gin-gonic/gin"
+  badgen:
+    - id: Gin
+      raw:
+      href: "https://github.com/gin-gonic/gin"
