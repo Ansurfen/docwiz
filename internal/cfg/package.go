@@ -53,7 +53,7 @@ func (c PackageJSON) ProjectVersion() string {
 func (c PackageJSON) ProjectDependencies() []Dependency {
 	deps := []Dependency{}
 	for depName, depVersion := range c.Dependencies {
-		deps = append(deps, BaseDependecy{name: depName, version: depVersion})
+		deps = append(deps, BaseDependency{name: depName, version: depVersion})
 	}
 	return deps
 }
@@ -61,9 +61,23 @@ func (c PackageJSON) ProjectDependencies() []Dependency {
 func (c PackageJSON) ProjectDevDependencies() []Dependency {
 	deps := []Dependency{}
 	for depName, depVersion := range c.DevDependencies {
-		deps = append(deps, BaseDependecy{name: depName, version: depVersion})
+		deps = append(deps, BaseDependency{name: depName, version: depVersion})
 	}
 	return deps
+}
+
+func (c PackageJSON) Environments() []Environment {
+	var envs []Environment
+
+	if len(c.Engines.NPM) != 0 {
+		envs = append(envs, BaseEnvironment{name: "NPM", version: c.Engines.NPM})
+	}
+
+	if len(c.Engines.Node) != 0 {
+		envs = append(envs, BaseEnvironment{name: "NodeJS", version: c.Engines.Node})
+	}
+
+	return envs
 }
 
 func ParsePackageJSON(path string) (Configure, error) {

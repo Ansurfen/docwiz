@@ -69,7 +69,7 @@ func (cp CSProj) ProjectDependencies() []Dependency {
 	var deps []Dependency
 	for _, itemGroup := range cp.ItemGroups {
 		for _, pkg := range itemGroup.PackageReferences {
-			deps = append(deps, BaseDependecy{name: pkg.PackageName, version: pkg.Version})
+			deps = append(deps, BaseDependency{name: pkg.PackageName, version: pkg.Version})
 		}
 	}
 	return deps
@@ -78,6 +78,8 @@ func (cp CSProj) ProjectDependencies() []Dependency {
 func (cp CSProj) ProjectDevDependencies() []Dependency {
 	return nil
 }
+
+func (cp CSProj) Environments() []Environment { return nil }
 
 func ParseCSProj(path string) (Configure, error) {
 	file, err := os.Open(path)

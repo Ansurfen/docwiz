@@ -33,7 +33,10 @@ func (*GoWalker) ParseFile(fullpath, file string, ctx *Context) error {
 		if err != nil {
 			return err
 		}
-		goBadge.Badge.SetVersion(mod.ProjectVersion())
+
+		if envs := mod.Environments(); len(envs) > 0 {
+			goBadge.Badge.SetVersion(envs[0].Version())
+		}
 
 		for _, dep := range mod.ProjectDependencies() {
 			b := goLib.Match(dep.Name(), ctx.stackKind)

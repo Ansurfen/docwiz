@@ -39,7 +39,7 @@ func (p POM) ProjectLicense() string { return "" }
 func (p POM) ProjectDependencies() []Dependency {
 	var deps []Dependency
 	for _, dep := range p.Dependencies {
-		deps = append(deps, BaseDependecy{name: dep.ArtifactId, version: dep.Version})
+		deps = append(deps, BaseDependency{name: dep.ArtifactId, version: dep.Version})
 	}
 	return deps
 }
@@ -47,6 +47,8 @@ func (p POM) ProjectDependencies() []Dependency {
 func (p POM) ProjectDevDependencies() []Dependency {
 	return nil
 }
+
+func (p POM) Environments() []Environment { return nil }
 
 func ParsePOM(path string) (Configure, error) {
 	file, err := os.Open(path)

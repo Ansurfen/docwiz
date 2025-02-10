@@ -45,14 +45,14 @@ func (ps PubSpec) ProjectDependencies() []Dependency {
 	deps := []Dependency{}
 	for name, ver := range ps.Dependencies {
 		if v, ok := ver.(string); ok {
-			deps = append(deps, BaseDependecy{name: name, version: v})
+			deps = append(deps, BaseDependency{name: name, version: v})
 			continue
 		}
 		if v, ok := ver.(map[string]any); ok {
 			if vv, ok := v["version"]; ok {
-				deps = append(deps, BaseDependecy{name: name, version: vv.(string)})
+				deps = append(deps, BaseDependency{name: name, version: vv.(string)})
 			} else {
-				deps = append(deps, BaseDependecy{name: name})
+				deps = append(deps, BaseDependency{name: name})
 			}
 		}
 	}
@@ -63,18 +63,22 @@ func (ps PubSpec) ProjectDevDependencies() []Dependency {
 	deps := []Dependency{}
 	for name, ver := range ps.DevDependencies {
 		if v, ok := ver.(string); ok {
-			deps = append(deps, BaseDependecy{name: name, version: v})
+			deps = append(deps, BaseDependency{name: name, version: v})
 			continue
 		}
 		if v, ok := ver.(map[string]any); ok {
 			if vv, ok := v["version"]; ok {
-				deps = append(deps, BaseDependecy{name: name, version: vv.(string)})
+				deps = append(deps, BaseDependency{name: name, version: vv.(string)})
 			} else {
-				deps = append(deps, BaseDependecy{name: name})
+				deps = append(deps, BaseDependency{name: name})
 			}
 		}
 	}
 	return deps
+}
+
+func (ps PubSpec) Environments() []Environment {
+	return []Environment{BaseEnvironment{name: "sdk", version: ps.Environment["sdk"]}}
 }
 
 func ParsePubSpec(path string) (Configure, error) {

@@ -19,10 +19,10 @@ New_DocWiz() {
     cd ./cli || exit
     local exePath=""
     if [[ "$os" == "windows" ]]; then
-        go build -o "../docwiz.exe" .
+        go build -o "../docwiz.exe" -ldflags "-X 'docwiz/cli/cmd.Version=$version'" .
         exePath="../docwiz.exe"
     else
-        go build -o "../docwiz" .
+        go build -o "../docwiz" -ldflags "-X 'docwiz/cli/cmd.Version=$version'" .
         exePath="../docwiz"
     fi
     cd ../ || exit

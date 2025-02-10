@@ -31,16 +31,12 @@ func (*RustWalker) ParseFile(fullpath string, file string, ctx *Context) error {
 	if err != nil {
 		return err
 	}
-	cargoToml := cargo.(cfg.CargoToml)
-	if _, ok := cargoToml.Package.RustVersion.(map[string]any); ok {
-		b.SetVersion(cargoToml.Workspace.Package.RustVersion.(string))
-	} else {
-		if v, ok := cargoToml.Package.RustVersion.(string); ok {
-			b.SetVersion(v)
-		}
+
+	if envs := cargo.Environments(); len(envs) > 0 {
+		b.SetVersion(envs[0].Version())
 	}
 
-	for _, dep := range cargoToml.ProjectDependencies() {
+	for _, dep := range cargo.ProjectDependencies() {
 		b := rustLib.Match(dep.Name(), ctx.stackKind)
 		if b.Badge == nil {
 			continue

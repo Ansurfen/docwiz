@@ -15,8 +15,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// securityCmdParameter stores parameters for the "security" command.
 type securityCmdParameter struct {
 	baseParameter
+
+	// repoPath specifies the path to the Git repository, from which information like tags will be gathered.
+	// The default value is the current directory ("./").
 	repoPath string
 	email    string
 }

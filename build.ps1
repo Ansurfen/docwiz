@@ -19,11 +19,11 @@ function New-DocWiz {
     Set-Location -Path "./cli"
     $exePath = ""
     if ($os -eq "windows") {
-        go build -o "../docwiz.exe" .
+        go build -o "../docwiz.exe" -ldflags "-X 'docwiz/cli/cmd.Version=$version'" .
         $exePath = "./docwiz.exe"
     }
     else {
-        go build -o "../docwiz" .
+        go build -o "../docwiz" -ldflags "-X 'docwiz/cli/cmd.Version=$version'" .
         $exePath = "./docwiz"
     }
 

@@ -36,11 +36,15 @@ func (*JavaScriptWalker) ParseFile(fullpath string, file string, ctx *Context) e
 			return err
 		}
 		pkgJson := pkg.(cfg.PackageJSON)
-		if len(pkgJson.Engines.NPM) != 0 {
-			ctx.Set("NPM", upgradeBadge("JavaScript", badge.ShieldNPM)).Badge.SetVersion(pkgJson.Engines.NPM)
-		}
-		if len(pkgJson.Engines.Node) != 0 {
-			ctx.Set("NodeJS", upgradeBadge("JavaScript", badge.ShieldNodeJS)).Badge.SetVersion(pkgJson.Engines.Node)
+
+		for _, env := range pkgJson.Environments() {
+			var b badge.Badge
+			if env.Name() == "NPM" {
+				b = badge.ShieldNPM
+			} else if env.Name() == "NodeJS" {
+				b = badge.ShieldNodeJS
+			}
+			ctx.Set(env.Name(), upgradeBadge("JavaScript", b)).Badge.SetVersion(env.Version())
 		}
 
 		for _, dep := range pkg.ProjectDependencies() {

@@ -31,8 +31,12 @@ func (*DartWalker) ParseFile(fullpath string, file string, ctx *Context) error {
 	if err != nil {
 		return err
 	}
-	ps := pubspec.(cfg.PubSpec)
-	ctx.Get("Dart").Badge.SetVersion(ps.Environment["sdk"])
+
+	for _, env := range pubspec.Environments() {
+		if env.Name() == "sdk" {
+			ctx.Get("Dart").Badge.SetVersion(env.Version())
+		}
+	}
 
 	for _, dep := range pubspec.ProjectDependencies() {
 		b := dartLib.Match(dep.Name(), ctx.stackKind)

@@ -47,12 +47,14 @@ func (c Composer) ProjectLicense() string {
 func (c Composer) ProjectDependencies() []Dependency {
 	var deps []Dependency
 	for name, ver := range c.Dependencies {
-		deps = append(deps, BaseDependecy{name: name, version: ver})
+		deps = append(deps, BaseDependency{name: name, version: ver})
 	}
 	return deps
 }
 
 func (c Composer) ProjectDevDependencies() []Dependency { return nil }
+
+func (c Composer) Environments() []Environment { return nil }
 
 func ParseComposer(path string) (Configure, error) {
 	data, err := os.ReadFile(path)

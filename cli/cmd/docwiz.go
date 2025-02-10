@@ -11,10 +11,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	version         = "0.0.2"
-	defaultLanguage = "en_us"
-)
+const defaultLanguage = "en_us"
+
+// Version will be set by the build process using -ldflags.
+// Do not modify this variable directly. It is populated at build time with the desired version string.
+var Version = ""
 
 var (
 	COPYRIGHT = []byte("\n---\n\n_This Markdown was generated with ❤️ by [docwiz](https://github.com/ansurfen/docwiz)_")

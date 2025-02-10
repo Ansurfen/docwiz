@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// RoadMapCmdParameter stores parameters for the "roadmap" command.
 type RoadMapCmdParameter struct {
 	baseParameter
 	kind string
@@ -49,7 +50,7 @@ based on predefined templates and provide information like versioning, kind, the
 					defer func() {
 						if err := recover(); err != nil {
 							output.Rollback()
-							fmt.Println(err)
+							log.Fata(err)
 						}
 					}()
 

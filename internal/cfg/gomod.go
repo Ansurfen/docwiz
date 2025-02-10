@@ -13,6 +13,7 @@ type GoMod struct {
 	name         string
 	version      string
 	dependencies []Dependency
+	file         *modfile.File
 }
 
 func (gm GoMod) ProjectName() string {
@@ -37,6 +38,10 @@ func (gm GoMod) ProjectDevDependencies() []Dependency {
 	return gm.dependencies
 }
 
+func (gm GoMod) Environments() []Environment {
+	return []Environment{BaseEnvironment{name: "Go", version: gm.file.Go.Version}}
+}
+
 func ParseGoMod(path string) (Configure, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -49,13 +54,12 @@ func ParseGoMod(path string) (Configure, error) {
 	}
 
 	mod := GoMod{
-		name:    modFile.Module.Mod.Path,
-		// TODO project version / environment version
-		version: modFile.Go.Version,
+		name: modFile.Module.Mod.Path,
+		file: modFile,
 	}
 
 	for _, req := range modFile.Require {
-		mod.dependencies = append(mod.dependencies, BaseDependecy{name: req.Mod.Path, version: req.Mod.Version})
+		mod.dependencies = append(mod.dependencies, BaseDependency{name: req.Mod.Path, version: req.Mod.Version})
 	}
 	return mod, nil
 }

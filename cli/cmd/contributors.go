@@ -13,6 +13,9 @@ import (
 
 type ContributorsCmdParameter struct {
 	baseParameter
+
+	// repoPath specifies the path to the Git repository, from which information like tags will be gathered.
+	// The default value is the current directory ("./").
 	repoPath string
 }
 

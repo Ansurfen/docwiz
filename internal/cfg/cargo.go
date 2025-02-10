@@ -65,12 +65,12 @@ func (ct CargoToml) ProjectDependencies() []Dependency {
 	for name, value := range ct.Dependencies {
 		if v, ok := value.(map[string]any); ok {
 			if vv, ok := v["version"].(string); ok {
-				deps = append(deps, BaseDependecy{name: name, version: vv})
+				deps = append(deps, BaseDependency{name: name, version: vv})
 			} else {
-				deps = append(deps, BaseDependecy{name: name})
+				deps = append(deps, BaseDependency{name: name})
 			}
 		} else {
-			deps = append(deps, BaseDependecy{name: name, version: value.(string)})
+			deps = append(deps, BaseDependency{name: name, version: value.(string)})
 		}
 	}
 	return deps
@@ -81,15 +81,27 @@ func (ct CargoToml) ProjectDevDependencies() []Dependency {
 	for name, value := range ct.DevDependencies {
 		if v, ok := value.(map[string]any); ok {
 			if vv, ok := v["version"].(string); ok {
-				deps = append(deps, BaseDependecy{name: name, version: vv})
+				deps = append(deps, BaseDependency{name: name, version: vv})
 			} else {
-				deps = append(deps, BaseDependecy{name: name})
+				deps = append(deps, BaseDependency{name: name})
 			}
 		} else {
-			deps = append(deps, BaseDependecy{name: name, version: value.(string)})
+			deps = append(deps, BaseDependency{name: name, version: value.(string)})
 		}
 	}
 	return deps
+}
+
+func (ct CargoToml) Environments() []Environment {
+	var envs []Environment
+	if _, ok := ct.Package.RustVersion.(map[string]any); ok {
+		envs = append(envs, BaseEnvironment{name: "rust", version: ct.Workspace.Package.RustVersion.(string)})
+	} else {
+		if v, ok := ct.Package.RustVersion.(string); ok {
+			envs = append(envs, BaseEnvironment{name: "rust", version: v})
+		}
+	}
+	return envs
 }
 
 func ParseCargoToml(path string) (Configure, error) {
@@ -98,6 +110,6 @@ func ParseCargoToml(path string) (Configure, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return cargo, nil
 }

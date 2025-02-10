@@ -13,14 +13,14 @@ library:
     match: full
     badge: Gin
 badges:
-  - kind: shield
-    id: Gin
-    label: Gin
-    color: "#ffffff"
-    logo: go
-    logoColor: blue
-    href: "https://github.com/gin-gonic/gin"
-  - kind: badgen
-    id: Gin
-    raw: 
-    href: "https://github.com/gin-gonic/gin"
+  shield:
+    - id: Gin
+      label: Gin
+      color: "#ffffff"
+      logo: go
+      logoColor: blue
+      href: "https://github.com/gin-gonic/gin"
+  badgen:
+    - id: Gin
+      raw:
+      href: "https://github.com/gin-gonic/gin"
