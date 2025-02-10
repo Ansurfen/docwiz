@@ -5,6 +5,7 @@ package cfg
 
 import (
 	"encoding/json"
+	"io"
 	"os"
 	"strings"
 )
@@ -56,8 +57,8 @@ func (c Composer) ProjectDevDependencies() []Dependency { return nil }
 
 func (c Composer) Environments() []Environment { return nil }
 
-func ParseComposer(path string) (Configure, error) {
-	data, err := os.ReadFile(path)
+func LoadComposer(r io.Reader) (Configure, error) {
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
@@ -69,4 +70,16 @@ func ParseComposer(path string) (Configure, error) {
 		return nil, err
 	}
 	return composer, nil
+}
+
+func LoadComposerFromFile(filename string) (Configure, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	return LoadComposer(file)
+}
+
+func LoadComposerFromString(str string) (Configure, error) {
+	return LoadComposer(strings.NewReader(str))
 }

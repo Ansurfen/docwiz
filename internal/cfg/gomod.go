@@ -4,7 +4,9 @@
 package cfg
 
 import (
+	"io"
 	"os"
+	"strings"
 
 	"golang.org/x/mod/modfile"
 )
@@ -42,13 +44,13 @@ func (gm GoMod) Environments() []Environment {
 	return []Environment{BaseEnvironment{name: "Go", version: gm.file.Go.Version}}
 }
 
-func ParseGoMod(path string) (Configure, error) {
-	data, err := os.ReadFile(path)
+func LoadGoMod(r io.Reader) (Configure, error) {
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
 
-	modFile, err := modfile.Parse(path, data, nil)
+	modFile, err := modfile.Parse("go.mod", data, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -62,4 +64,16 @@ func ParseGoMod(path string) (Configure, error) {
 		mod.dependencies = append(mod.dependencies, BaseDependency{name: req.Mod.Path, version: req.Mod.Version})
 	}
 	return mod, nil
+}
+
+func LoadGoModFromFile(filename string) (Configure, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	return LoadGoMod(file)
+}
+
+func LoadGoModFromString(str string) (Configure, error) {
+	return LoadGoMod(strings.NewReader(str))
 }

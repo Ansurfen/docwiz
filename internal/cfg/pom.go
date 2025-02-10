@@ -5,7 +5,9 @@ package cfg
 
 import (
 	"encoding/xml"
+	"io"
 	"os"
+	"strings"
 )
 
 type POM struct {
@@ -50,15 +52,23 @@ func (p POM) ProjectDevDependencies() []Dependency {
 
 func (p POM) Environments() []Environment { return nil }
 
-func ParsePOM(path string) (Configure, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
+func LoadPOM(r io.Reader) (Configure, error) {
 	var pom POM
-	err = xml.NewDecoder(file).Decode(&pom)
+	err := xml.NewDecoder(r).Decode(&pom)
 	if err != nil {
 		return nil, err
 	}
 	return pom, nil
+}
+
+func LoadPOMFromFile(filename string) (Configure, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	return LoadPOM(file)
+}
+
+func LoadPOMFromString(str string) (Configure, error) {
+	return LoadPOM(strings.NewReader(str))
 }

@@ -27,7 +27,7 @@ func (*JavaWalker) ParseExt(fullpath string, ext string, ctx *Context) error {
 
 func (*JavaWalker) ParseFile(fullpath string, file string, ctx *Context) error {
 	ctx.Set("Maven", upgradeBadge("Java", badge.ShieldApacheMaven))
-	pom, err := cfg.ParsePOM(fullpath)
+	pom, err := cfg.LoadPOMFromFile(fullpath)
 	if err != nil {
 		return err
 	}

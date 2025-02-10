@@ -27,7 +27,7 @@ func (*RustWalker) ParseExt(fullpath string, ext string, ctx *Context) error {
 
 func (*RustWalker) ParseFile(fullpath string, file string, ctx *Context) error {
 	b := ctx.Set("Rust", upgradeBadge("Rust", badge.ShieldRust))
-	cargo, err := cfg.ParseCargoToml(fullpath)
+	cargo, err := cfg.LoadCargoFromFile(fullpath)
 	if err != nil {
 		return err
 	}

@@ -29,7 +29,7 @@ func (*GoWalker) ParseFile(fullpath, file string, ctx *Context) error {
 	switch file {
 	case "go.mod":
 		goBadge := ctx.Set("Go", goBadge(ctx))
-		mod, err := cfg.ParseGoMod(fullpath)
+		mod, err := cfg.LoadCSProjFromFile(fullpath)
 		if err != nil {
 			return err
 		}

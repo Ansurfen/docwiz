@@ -31,7 +31,7 @@ func (*JavaScriptWalker) ParseFile(fullpath string, file string, ctx *Context) e
 	case "deno.json", "deno.jsonc":
 		ctx.Set("Deno", upgradeBadge("JavaScript", badge.ShieldDenoJS))
 	case "package.json":
-		pkg, err := cfg.ParsePackageJSON(fullpath)
+		pkg, err := cfg.LoadCSProjFromFile(fullpath)
 		if err != nil {
 			return err
 		}

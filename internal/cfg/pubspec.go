@@ -4,7 +4,9 @@
 package cfg
 
 import (
+	"io"
 	"os"
+	"strings"
 
 	"gopkg.in/yaml.v3"
 )
@@ -81,15 +83,23 @@ func (ps PubSpec) Environments() []Environment {
 	return []Environment{BaseEnvironment{name: "sdk", version: ps.Environment["sdk"]}}
 }
 
-func ParsePubSpec(path string) (Configure, error) {
+func LoadPubSpec(r io.Reader) (Configure, error) {
 	var pubspec PubSpec
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	err = yaml.NewDecoder(file).Decode(&pubspec)
+	err := yaml.NewDecoder(r).Decode(&pubspec)
 	if err != nil {
 		return nil, err
 	}
 	return pubspec, nil
+}
+
+func LoadPubSpecFromFile(filename string) (Configure, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	return LoadPubSpec(file)
+}
+
+func LoadPubSpecFromString(str string) (Configure, error) {
+	return LoadPubSpec(strings.NewReader(str))
 }

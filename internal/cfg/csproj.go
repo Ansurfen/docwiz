@@ -5,6 +5,7 @@ package cfg
 
 import (
 	"encoding/xml"
+	"io"
 	"os"
 	"strings"
 )
@@ -81,24 +82,23 @@ func (cp CSProj) ProjectDevDependencies() []Dependency {
 
 func (cp CSProj) Environments() []Environment { return nil }
 
-func ParseCSProj(path string) (Configure, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
+func LoadCSProj(r io.Reader) (Configure, error) {
 	var csproj CSProj
-	err = xml.NewDecoder(file).Decode(&csproj)
+	err := xml.NewDecoder(r).Decode(&csproj)
 	if err != nil {
 		return nil, err
 	}
 	return csproj, nil
 }
 
-func ParseCSProjFromString(s string) (Configure, error) {
-	var csproj CSProj
-	err := xml.NewDecoder(strings.NewReader(s)).Decode(&csproj)
+func LoadCSProjFromFile(filename string) (Configure, error) {
+	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
 	}
-	return csproj, nil
+	return LoadCSProj(file)
+}
+
+func LoadCSProjFromString(str string) (Configure, error) {
+	return LoadCSProj(strings.NewReader(str))
 }

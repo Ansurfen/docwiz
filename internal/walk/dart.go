@@ -27,7 +27,7 @@ func (*DartWalker) ParseExt(fullpath string, ext string, ctx *Context) error {
 
 func (*DartWalker) ParseFile(fullpath string, file string, ctx *Context) error {
 	ctx.Set("Dart", upgradeBadge("Dart", badge.ShieldDart))
-	pubspec, err := cfg.ParsePubSpec(fullpath)
+	pubspec, err := cfg.LoadPubSpecFromFile(fullpath)
 	if err != nil {
 		return err
 	}

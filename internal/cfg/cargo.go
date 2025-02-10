@@ -3,7 +3,12 @@
 // license that can be found in the LICENSE file.
 package cfg
 
-import "github.com/BurntSushi/toml"
+import (
+	"io"
+	"strings"
+
+	"github.com/BurntSushi/toml"
+)
 
 type CargoToml struct {
 	Workspace       CargoTomlWorkspace     `toml:"workspace"`
@@ -45,11 +50,19 @@ func (ct CargoToml) ProjectVersion() string {
 }
 
 func (ct CargoToml) ProjectAuthor() string {
-	if _, ok := ct.Package.Authors.(map[string]any); ok {
+	switch authors := ct.Package.Authors.(type) {
+	case map[string]any:
 		return ct.Workspace.Package.Authors.(string)
-	} else {
-		return ct.Package.Authors.(string)
+	case []any:
+		ret := []string{}
+		for _, author := range authors {
+			ret = append(ret, author.(string))
+		}
+		return strings.Join(ret, ";")
+	case string:
+		return authors
 	}
+	return ""
 }
 
 func (ct CargoToml) ProjectLicense() string {
@@ -104,12 +117,26 @@ func (ct CargoToml) Environments() []Environment {
 	return envs
 }
 
-func ParseCargoToml(path string) (Configure, error) {
+func LoadCargo(r io.Reader) (Configure, error) {
 	var cargo CargoToml
-	_, err := toml.DecodeFile(path, &cargo)
+	_, err := toml.NewDecoder(r).Decode(&cargo)
 	if err != nil {
 		return nil, err
 	}
 
 	return cargo, nil
+}
+
+func LoadCargoFromFile(filename string) (Configure, error) {
+	var cargo CargoToml
+	_, err := toml.DecodeFile(filename, &cargo)
+	if err != nil {
+		return nil, err
+	}
+
+	return cargo, nil
+}
+
+func LoadCargoFromString(str string) (Configure, error) {
+	return LoadCargo(strings.NewReader(str))
 }

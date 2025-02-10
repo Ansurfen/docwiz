@@ -5,7 +5,9 @@ package cfg
 
 import (
 	"encoding/json"
+	"io"
 	"os"
+	"strings"
 )
 
 type PackageJSON struct {
@@ -80,8 +82,8 @@ func (c PackageJSON) Environments() []Environment {
 	return envs
 }
 
-func ParsePackageJSON(path string) (Configure, error) {
-	data, err := os.ReadFile(path)
+func LoadPackageJSON(r io.Reader) (Configure, error) {
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
@@ -93,4 +95,16 @@ func ParsePackageJSON(path string) (Configure, error) {
 		return nil, err
 	}
 	return pkg, nil
+}
+
+func LoadPackageJSONFromFile(filename string) (Configure, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	return LoadPackageJSON(file)
+}
+
+func LoadPackageJSONFromString(str string) (Configure, error) {
+	return LoadPackageJSON(strings.NewReader(str))
 }
