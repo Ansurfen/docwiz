@@ -18,25 +18,20 @@ type DependencyResolver struct {
 }
 
 func (w *DependencyResolver) Match(name string) ExtendedBadge {
-	var ret ExtendedBadge
 	if v, ok := w.Full[name]; ok {
-		ret = v
-		goto handle
+		return v
 	}
 	for k, v := range w.Partial {
 		if strings.HasPrefix(name, k) {
-			ret = v
-			goto handle
+			return v
 		}
 	}
 	for k, v := range w.Fuzzy {
 		if strings.Contains(name, k) {
-			ret = v
-			goto handle
+			return v
 		}
 	}
-handle:
-	return ret
+	return nil
 }
 
 func ResolveDependency(ctx *Context, resolvers map[BadgeKind]*DependencyResolver, cfg cfg.Configure, tag string) error {

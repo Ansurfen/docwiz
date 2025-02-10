@@ -16,7 +16,13 @@ func (*Walker) SubscribeExt() []string {
 	return []string{".ex", ".exs", ".eex", ".leex"}
 }
 
+func (*Walker) SubscribeFile() []string {
+	return []string{"mix.exs"}
+}
+
 func (*Walker) ParseExt(fullpath string, ext string, ctx *walk.Context) error {
 	ctx.Set("Elixir", walk.UpgradeBadge("Elixir", badge.ShieldElixir))
 	return nil
 }
+
+// Phoenix Framework

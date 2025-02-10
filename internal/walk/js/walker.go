@@ -18,7 +18,7 @@ func (*Walker) SubscribeExt() []string {
 }
 
 func (*Walker) SubscribeFile() []string {
-	return []string{"package.json", "bun.lockb", "package-lock.json", "deno.json", "deno.jsonc"}
+	return []string{"package.json", "bun.lockb", "package-lock.json", "deno.json", "deno.jsonc", "pnpm-lock.yaml"}
 }
 
 func (*Walker) ParseExt(fullpath string, ext string, ctx *walk.Context) error {
@@ -32,7 +32,7 @@ func (*Walker) ParseFile(fullpath string, file string, ctx *walk.Context) error 
 	case "deno.json", "deno.jsonc":
 		ctx.Set("Deno", walk.UpgradeBadge("JavaScript", badge.ShieldDenoJS))
 	case "package.json":
-		pkg, err := cfg.LoadCSProjFromFile(fullpath)
+		pkg, err := cfg.LoadPackageJSONFromFile(fullpath)
 		if err != nil {
 			return err
 		}
@@ -47,12 +47,14 @@ func (*Walker) ParseFile(fullpath string, file string, ctx *walk.Context) error 
 			ctx.Set(env.Name(), walk.UpgradeBadge("JavaScript", b)).Badge.SetVersion(env.Version())
 		}
 
-		walk.ResolveDependency(ctx,
+		return walk.ResolveDependency(ctx,
 			map[walk.BadgeKind]*walk.DependencyResolver{
 				walk.BadgeKindShield: shieldJSResolver,
 			}, pkg, "JavaScript")
 	case "bun.lockb":
 		ctx.Set("Bun", walk.UpgradeBadge("JavaScript", badge.ShieldBun))
+	case "pnpm-lock.yaml":
+		ctx.Set("PNPM", walk.UpgradeBadge("JavaScript", badge.ShieldPNPM))
 	}
 	return nil
 }

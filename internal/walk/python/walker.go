@@ -11,11 +11,12 @@ import (
 )
 
 var (
-	hasFastAPI = regexp.MustCompile(`(?i)\b(import\s+FastAPI|from\s+FastAPI)`)
-	hasFlask   = regexp.MustCompile(`(?i)\b(import\s+flask|from\s+flask)`)
-	hasDjango  = regexp.MustCompile(`(?i)\b(import\s+django|from\s+django)`)
-	hasAioHttp = regexp.MustCompile(`(?i)\b(import\s+aiohttp|from\s+aiohttp)`)
-	hasJinja2  = regexp.MustCompile(`(?i)\b(import\s+jinja2|from\s+jinja2)`)
+	hasFastAPI    = regexp.MustCompile(`(?i)\b(import\s+FastAPI|from\s+FastAPI)`)
+	hasFlask      = regexp.MustCompile(`(?i)\b(import\s+flask|from\s+flask)`)
+	hasDjango     = regexp.MustCompile(`(?i)\b(import\s+django|from\s+django)`)
+	hasAioHttp    = regexp.MustCompile(`(?i)\b(import\s+aiohttp|from\s+aiohttp)`)
+	hasJinja2     = regexp.MustCompile(`(?i)\b(import\s+jinja2|from\s+jinja2)`)
+	hasMaxCompute = regexp.MustCompile(`(?i)\b(import\s+odps|from\s+odps)`)
 )
 
 type Walker struct {
@@ -24,6 +25,10 @@ type Walker struct {
 
 func (*Walker) SubscribeExt() []string {
 	return []string{".py", ".pyi", ".pyc", ".pyo"}
+}
+
+func (*Walker) SubscribeFile() []string {
+	return []string{"pyproject.toml"}
 }
 
 func (*Walker) ParseExt(fullpath string, ext string, ctx *walk.Context) error {
@@ -45,10 +50,17 @@ func (*Walker) ParseExt(fullpath string, ext string, ctx *walk.Context) error {
 			ctx.Set("AioHTTP", walk.UpgradeBadge("Python", badge.ShieldAiohttp))
 		} else if hasJinja2.MatchString(script) {
 			ctx.Set("Jinja", walk.UpgradeBadge("Python", badge.ShieldJinja))
+		} else if hasMaxCompute.MatchString(script) {
+			ctx.Set("MaxCompute", walk.UpgradeBadge("Python", badge.ShieldJinja))
 		}
 		fallthrough
 	default:
 		ctx.Set("Python", walk.UpgradeBadge("Python", badge.ShieldPython))
 	}
+	return nil
+}
+
+func (*Walker) ParseFile(fullpath string, file string, ctx *walk.Context) error {
+	ctx.Set("Poetry", walk.UpgradeBadge("Python", badge.ShieldPoetry))
 	return nil
 }

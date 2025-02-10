@@ -27,7 +27,7 @@ func (*Walker) ParseFile(fullpath, file string, ctx *walk.Context) error {
 	switch file {
 	case "go.mod":
 		goBadge := ctx.Set("Go", walk.UpgradeBadge("Go", badge.ShieldGo))
-		mod, err := cfg.LoadCSProjFromFile(fullpath)
+		mod, err := cfg.LoadGoModFromFile(fullpath)
 		if err != nil {
 			return err
 		}

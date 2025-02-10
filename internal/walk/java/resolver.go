@@ -17,6 +17,8 @@ var shiledJavaResolver = &walk.DependencyResolver{
 		"springfox-swagger-ui":       walk.SystemVersionBadge{Badge: badge.ShieldSwagger},
 		"jedis":                      walk.SystemVersionBadge{Badge: badge.ShieldRedis},
 		"elasticsearch-rest-client":  walk.SystemVersionBadge{Badge: badge.ShieldElasticSearch},
+		"odps-sdk":                   walk.SystemVersionBadge{Badge: badge.ShieldMaxCompute},
+		"lwjgl-opengl":               walk.SystemVersionBadge{Badge: badge.ShieldOpenGL},
 	},
 	Fuzzy: walk.ResolverPattern{
 		"tomcat":  walk.DependencyVersionBadge{Badge: badge.ShieldApacheTomcat},
@@ -25,5 +27,6 @@ var shiledJavaResolver = &walk.DependencyResolver{
 		"hive-":   walk.DependencyVersionBadge{Badge: badge.ShieldApacheHive},
 		"apollo-": walk.DependencyVersionBadge{Badge: badge.ShieldApolloGraphQL},
 		"javafx":  walk.DependencyVersionBadge{Badge: badge.ShieldJavaFX},
+		"opencv":  walk.SystemVersionBadge{Badge: badge.ShieldOpenCV},
 	},
 }

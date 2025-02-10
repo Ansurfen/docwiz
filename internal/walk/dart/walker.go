@@ -36,19 +36,11 @@ func (*Walker) ParseFile(fullpath string, file string, ctx *walk.Context) error 
 		}
 	}
 
-	walk.ResolveDependency(ctx, map[walk.BadgeKind]*walk.DependencyResolver{}, pubspec, "Dart")
-
-	// for _, dep := range pubspec.ProjectDevDependencies() {
-	// 	b := shiledDartResolver.Match(dep.Name(), ctx.stackKind)
-	// 	if b.Badge == nil {
-	// 		continue
-	// 	}
-	// 	if b.Type == useLibVersion {
-	// 		b.Badge.SetVersion(dep.Version())
-	// 	}
-	// 	ctx.Set(b.Name(), UpgradeBadge("Dart", b))
-	// }
-	return nil
+	return walk.ResolveDependency(ctx,
+		map[walk.BadgeKind]*walk.DependencyResolver{
+			walk.BadgeKindShield: shiledDartResolver,
+		},
+		pubspec, "Dart")
 }
 
 var shiledDartResolver = &walk.DependencyResolver{
@@ -56,5 +48,3 @@ var shiledDartResolver = &walk.DependencyResolver{
 		"flutter": walk.DependencyVersionBadge{Badge: badge.ShieldFlutter},
 	},
 }
-
-var badgenDartResolver = &walk.DependencyResolver{}

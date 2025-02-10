@@ -39,6 +39,13 @@ var shieldJSResolver = &walk.DependencyResolver{
 		"jasmine":                 walk.DependencyVersionBadge{Badge: badge.ShieldJasmine},
 		"jquery":                  walk.DependencyVersionBadge{Badge: badge.ShieldJQuery},
 		"zod":                     walk.DependencyVersionBadge{Badge: badge.ShieldZod},
+		"less":                    walk.DependencyVersionBadge{Badge: badge.ShieldLess},
+		"nuxt":                    walk.DependencyVersionBadge{Badge: badge.ShieldNuxtJS},
+		"nx":                      walk.DependencyVersionBadge{Badge: badge.ShieldNx},
+		"opencv4nodejs":           walk.SystemVersionBadge{Badge: badge.ShieldOpenCV},
+		"gl":                      walk.SystemVersionBadge{Badge: badge.ShieldOpenGL},
+		"p5":                      walk.DependencyVersionBadge{Badge: badge.ShieldP5js},
+		"pnpm":                    walk.DependencyVersionBadge{Badge: badge.ShieldPNPM},
 	},
 	Fuzzy: walk.ResolverPattern{
 		"@angular":      walk.DependencyVersionBadge{Badge: badge.ShieldAngular},
@@ -46,5 +53,11 @@ var shieldJSResolver = &walk.DependencyResolver{
 		"elasticsearch": walk.SystemVersionBadge{Badge: badge.ShieldElasticSearch},
 		"Framework7":    walk.DependencyVersionBadge{Badge: badge.ShieldFramework7},
 		"@ionic":        walk.DependencyVersionBadge{Badge: badge.ShieldIonic},
+		"@mui":          walk.DependencyVersionBadge{Badge: badge.ShieldMUI},
+		"meteor":        walk.DependencyVersionBadge{Badge: badge.ShieldMeteorJS},
+		"@mantine":      walk.DependencyVersionBadge{Badge: badge.ShieldMantine},
 	},
 }
+
+// Nodemon
+// Node-RED

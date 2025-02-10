@@ -35,7 +35,7 @@ cd ./docwiz
 你能够在[这里](https://github.com/Ansurfen/docwiz/releases)下载到二进制版本。
 
 ## 🚀 使用
-> [!注意]
+> [!NOTE]
 > The details are viewed using `docwiz -h`
 
 ### readme
