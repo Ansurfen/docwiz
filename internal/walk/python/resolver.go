@@ -10,13 +10,16 @@ import (
 
 var shieldPythonResolver = &walk.DependencyResolver{
 	Full: walk.ResolverPattern{
-		"fastapi": walk.DependencyVersionBadge{Badge: shieldFastAPI},
-		"Jinja2":  walk.DependencyVersionBadge{Badge: badge.ShieldJinja},
-		"odps":    walk.DependencyVersionBadge{Badge: badge.ShieldMaxCompute},
-		"django":  walk.DependencyVersionBadge{Badge: shieldDjango},
-		"flask":   walk.DependencyVersionBadge{Badge: shieldFlask},
-		"prefect": walk.DependencyVersionBadge{Badge: badge.ShieldPrefect},
-		"pug":     walk.DependencyVersionBadge{Badge: badge.ShieldPug},
-		"pytest":  walk.DependencyVersionBadge{Badge: badge.ShieldPytest},
+		"python":    walk.DependencyVersionBadge{Badge: badge.ShieldPython},
+		"fastapi":   walk.DependencyVersionBadge{Badge: shieldFastAPI},
+		"Jinja2":    walk.DependencyVersionBadge{Badge: badge.ShieldJinja},
+		"odps":      walk.DependencyVersionBadge{Badge: badge.ShieldMaxCompute},
+		"django":    walk.DependencyVersionBadge{Badge: shieldDjango},
+		"flask":     walk.DependencyVersionBadge{Badge: shieldFlask},
+		"prefect":   walk.DependencyVersionBadge{Badge: badge.ShieldPrefect},
+		"pug":       walk.DependencyVersionBadge{Badge: badge.ShieldPug},
+		"pytest":    walk.DependencyVersionBadge{Badge: badge.ShieldPytest},
+		"scrapy":    walk.DependencyVersionBadge{Badge: badge.ShieldScrapy},
+		"streamlit": walk.DependencyVersionBadge{Badge: badge.ShieldStreamlit},
 	},
 }

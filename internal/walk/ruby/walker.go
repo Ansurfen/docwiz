@@ -20,3 +20,6 @@ func (*Walker) ParseExt(fullpath string, file string, ctx *walk.Context) error {
 	ctx.Set("Ruby", walk.UpgradeBadge("Ruby", badge.ShieldRuby))
 	return nil
 }
+
+// Rails
+// RayLib

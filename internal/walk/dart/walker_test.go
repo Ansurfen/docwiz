@@ -4,7 +4,7 @@
 package dartwalk_test
 
 import (
-	"docwiz/internal/git"
+	"docwiz/internal/cfg"
 	"docwiz/internal/walk"
 	dartwalk "docwiz/internal/walk/dart"
 	"fmt"
@@ -13,7 +13,7 @@ import (
 
 func TestWalk(t *testing.T) {
 	ctx := &walk.Context{
-		Ignore: &git.GitIgnore{},
+		Ignore: &cfg.DocWizIgnore{},
 		Walkers: []walk.Walker{
 			&dartwalk.Walker{},
 		},

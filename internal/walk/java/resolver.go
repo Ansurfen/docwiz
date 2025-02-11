@@ -19,6 +19,7 @@ var shiledJavaResolver = &walk.DependencyResolver{
 		"elasticsearch-rest-client":  walk.SystemVersionBadge{Badge: badge.ShieldElasticSearch},
 		"odps-sdk":                   walk.SystemVersionBadge{Badge: badge.ShieldMaxCompute},
 		"lwjgl-opengl":               walk.SystemVersionBadge{Badge: badge.ShieldOpenGL},
+		"thymeleaf":                  walk.DependencyVersionBadge{Badge: badge.ShieldThymeleaf},
 	},
 	Fuzzy: walk.ResolverPattern{
 		"tomcat":  walk.DependencyVersionBadge{Badge: badge.ShieldApacheTomcat},

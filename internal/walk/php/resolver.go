@@ -17,6 +17,7 @@ var shieldPHPResolver = &walk.DependencyResolver{
 		"opencv":                 walk.SystemVersionBadge{Badge: badge.ShieldOpenCV},
 	},
 	Fuzzy: walk.ResolverPattern{
-		"joomla": walk.DependencyVersionBadge{Badge: badge.ShieldJoomla},
+		"joomla":  walk.DependencyVersionBadge{Badge: badge.ShieldJoomla},
+		"symfony": walk.SystemVersionBadge{Badge: badge.ShieldSymfony},
 	},
 }

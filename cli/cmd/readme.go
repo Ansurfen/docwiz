@@ -4,7 +4,7 @@
 package cmd
 
 import (
-	"docwiz/internal/git"
+	"docwiz/internal/cfg"
 	"docwiz/internal/io"
 	"docwiz/internal/log"
 	"docwiz/internal/os"
@@ -100,9 +100,9 @@ theme, and whether to include copyright information.`,
   docwiz readme`,
 		Run: func(cmd *cobra.Command, args []string) {
 			if readmeParameter.scan {
-				ignore, err := git.CompileIgnoreFile(".docwizignore")
+				ignore, err := cfg.LoadDocWizIgnore(".docwizignore")
 				if err != nil {
-					ignore = &git.GitIgnore{}
+					log.Fata(err)
 				}
 				if len(readmeParameter.output) == 0 {
 					readmeParameter.output = "README.md"

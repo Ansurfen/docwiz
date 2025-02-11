@@ -18,27 +18,3 @@ type SortableBadge struct {
 	Badge
 	Tag string
 }
-
-type BadgeUnion struct {
-	BadgenBadge TypedBadge
-	ShieldBadge TypedBadge
-}
-
-func (*BadgeUnion) Name() string { return "" }
-
-func (*BadgeUnion) SetVersion(string) {}
-
-func (*BadgeUnion) URL() string { return "" }
-
-func (*BadgeUnion) Markdown() string { return "" }
-
-func (*BadgeUnion) RSt() string { return "" }
-
-func (*BadgeUnion) AsciiDoc() string { return "" }
-
-func (*BadgeUnion) HTML() string { return "" }
-
-type TypedBadge struct {
-	Type string
-	Badge
-}

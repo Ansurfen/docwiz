@@ -5,7 +5,7 @@ package walk
 
 import (
 	"docwiz/internal/badge"
-	"docwiz/internal/git"
+	"docwiz/internal/cfg"
 	"io/fs"
 	"path/filepath"
 	"sort"
@@ -35,7 +35,7 @@ func (BaseWalker) ParseFile(fullpath, file string, ctx *Context) error { return 
 func (BaseWalker) ParseDir(fullpath, dir string, ctx *Context) error   { return nil }
 
 type Context struct {
-	Ignore  *git.GitIgnore
+	Ignore  *cfg.DocWizIgnore
 	Walkers []Walker
 
 	Output   string
@@ -103,7 +103,9 @@ func (c *Context) generate() {
 
 	badgeStr := []string{}
 	for _, s := range stackPairs {
-		badgeStr = append(badgeStr, s.badge.Markdown())
+		if _, ok := c.Ignore.Badges[s.badge.Name()]; !ok {
+			badgeStr = append(badgeStr, s.badge.Markdown())
+		}
 	}
 
 	c.ProjectStack = strings.Join(badgeStr, " ")
@@ -131,7 +133,7 @@ func Walk(root string, ctx *Context) error {
 		if err != nil {
 			return err
 		}
-		if ctx.Ignore.MatchesPath(path) {
+		if ctx.Ignore.Git.MatchesPath(path) {
 			return nil
 		}
 

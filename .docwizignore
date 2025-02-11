@@ -1,8 +1,5 @@
-# 基于文件夹过滤
 *.md
-*.yaml
-*.yml
 
-# 过滤badge
-
-# 过滤库
+# @docwiz-badge
+Markdown
+YAML

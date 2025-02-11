@@ -50,6 +50,33 @@ var shieldJSResolver = &walk.DependencyResolver{
 		"p5":                      walk.DependencyVersionBadge{Badge: badge.ShieldP5js},
 		"pnpm":                    walk.DependencyVersionBadge{Badge: badge.ShieldPNPM},
 		"quasar":                  walk.DependencyVersionBadge{Badge: badge.ShieldQuasar},
+		"react":                   walk.DependencyVersionBadge{Badge: badge.ShieldReact},
+		"amqplib":                 walk.SystemVersionBadge{Badge: badge.ShieldRabbitMQ},
+		"react-native":            walk.DependencyVersionBadge{Badge: badge.ShieldReactNative},
+		"react-query":             walk.DependencyVersionBadge{Badge: badge.ShieldReactQuery},
+		"react-router-dom":        walk.DependencyVersionBadge{Badge: badge.ShieldReactRouter},
+		"react-hook-form":         walk.DependencyVersionBadge{Badge: badge.ShieldReactHookForm},
+		"redux":                   walk.DependencyVersionBadge{Badge: badge.ShieldRedux},
+		"remix":                   walk.DependencyVersionBadge{Badge: badge.ShieldRemix},
+		"rollup":                  walk.DependencyVersionBadge{Badge: badge.ShieldRollupJS},
+		"rxdb":                    walk.DependencyVersionBadge{Badge: badge.ShieldRxDB},
+		"rxjs":                    walk.DependencyVersionBadge{Badge: badge.ShieldRxJS},
+		"semantic-ui-react":       walk.DependencyVersionBadge{Badge: badge.ShieldSemanticUIReact},
+		"snowflake-sdk":           walk.DependencyVersionBadge{Badge: badge.ShieldSnowflake},
+		"socket.io":               walk.DependencyVersionBadge{Badge: badge.ShieldSocketIO},
+		"styled-components":       walk.DependencyVersionBadge{Badge: badge.ShieldStyledComponents},
+		"stylus":                  walk.DependencyVersionBadge{Badge: badge.ShieldStylus},
+		"svelte":                  walk.DependencyVersionBadge{Badge: badge.ShieldSvelte},
+		"@sveltejs/kit":           walk.DependencyVersionBadge{Badge: badge.ShieldSvelteKit},
+		"tailwindcss":             walk.DependencyVersionBadge{Badge: badge.ShieldTailwindCSS},
+		"@tauri-apps/api":         walk.DependencyVersionBadge{Badge: badge.ShieldTauri},
+		"three":                   walk.DependencyVersionBadge{Badge: badge.ShieldThreeJS},
+		"type-graphql":            walk.DependencyVersionBadge{Badge: badge.ShieldTypeGraphQL},
+		"unocss":                  walk.DependencyVersionBadge{Badge: badge.ShieldUnoCSS},
+		"vuetify":                 walk.DependencyVersionBadge{Badge: badge.ShieldVuetify},
+		"webpack":                 walk.DependencyVersionBadge{Badge: badge.ShieldWebpack},
+		"web3":                    walk.DependencyVersionBadge{Badge: badge.ShieldWeb3JS},
+		"windicss":                walk.DependencyVersionBadge{Badge: badge.ShieldWindiCSS},
 	},
 	Fuzzy: walk.ResolverPattern{
 		"@angular":      walk.DependencyVersionBadge{Badge: badge.ShieldAngular},
@@ -60,8 +87,14 @@ var shieldJSResolver = &walk.DependencyResolver{
 		"@mui":          walk.DependencyVersionBadge{Badge: badge.ShieldMUI},
 		"meteor":        walk.DependencyVersionBadge{Badge: badge.ShieldMeteorJS},
 		"@mantine":      walk.DependencyVersionBadge{Badge: badge.ShieldMantine},
+		"@radix-ui":     walk.SystemVersionBadge{Badge: badge.ShieldRadixUI},
+	},
+	Partial: walk.ResolverPattern{
+		"@trpc": walk.DependencyVersionBadge{Badge: badge.ShieldTRPC},
 	},
 }
 
 // Nodemon
 // Node-RED
+// strapi
+// WebGL
