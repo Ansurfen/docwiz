@@ -5,6 +5,7 @@ package csharpwalk
 
 import (
 	"docwiz/internal/badge"
+	"docwiz/internal/cfg"
 	"docwiz/internal/walk"
 )
 
@@ -28,10 +29,13 @@ func (*Walker) ParseExt(fullpath string, ext string, ctx *walk.Context) error {
 
 func (*Walker) ParseFile(fullpath string, file string, ctx *walk.Context) error {
 	ctx.Set(".NET", walk.UpgradeBadge("C#", badge.ShieldDotNet))
-	return nil
-}
+	csproj, err := cfg.LoadCSProjFromFile(file)
+	if err != nil {
+		return err
+	}
 
-// Blazor
-// opencv
-// opengl
-// Xamarin
+	return walk.ResolveDependency(ctx,
+		map[walk.BadgeKind]*walk.DependencyResolver{
+			walk.BadgeKindShield: shieldCSharpResolver,
+		}, csproj, "C#")
+}

@@ -77,6 +77,11 @@ var shieldJSResolver = &walk.DependencyResolver{
 		"webpack":                 walk.DependencyVersionBadge{Badge: badge.ShieldWebpack},
 		"web3":                    walk.DependencyVersionBadge{Badge: badge.ShieldWeb3JS},
 		"windicss":                walk.DependencyVersionBadge{Badge: badge.ShieldWindiCSS},
+		"@prisma/client":          walk.DependencyVersionBadge{Badge: badge.ShieldPrisma},
+		"sequelize":               walk.DependencyVersionBadge{Badge: badge.ShieldSequelize},
+		"typeorm":                 walk.DependencyVersionBadge{Badge: badge.ShieldTypeORM},
+		"quill":                   walk.DependencyVersionBadge{Badge: badge.ShieldQuill},
+		"@babel/core":             walk.DependencyVersionBadge{Badge: badge.ShieldBabel},
 	},
 	Fuzzy: walk.ResolverPattern{
 		"@angular":      walk.DependencyVersionBadge{Badge: badge.ShieldAngular},

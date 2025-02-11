@@ -117,6 +117,46 @@ var (
 		Href:      "https://www.android.com/",
 	}
 
+	ShieldAnsible = &ShieldBadge{
+		ID:        "Ansible",
+		Label:     "Ansible",
+		Color:     "#1A1918",
+		Style:     ShieldStyleForTheBadge,
+		Logo:      "ansible",
+		LogoColor: "white",
+		Href:      "https://www.ansible.com/",
+	}
+
+	ShieldArduino = &ShieldBadge{
+		ID:        "Arduino",
+		Label:     "Arduino",
+		Color:     "#00979D",
+		Style:     ShieldStyleForTheBadge,
+		Logo:      "Arduino",
+		LogoColor: "white",
+		Href:      "https://www.arduino.cc/",
+	}
+
+	ShieldBabel = &ShieldBadge{
+		ID:        "Babel",
+		Label:     "Babel",
+		Color:     "#F9DC3e",
+		Style:     ShieldStyleForTheBadge,
+		Logo:      "babel",
+		LogoColor: "black",
+		Href:      "https://babeljs.io/",
+	}
+
+	ShieldCisco = &ShieldBadge{
+		ID:        "Cisco",
+		Label:     "Cisco",
+		Color:     "#049fd9",
+		Style:     ShieldStyleForTheBadge,
+		Logo:      "cisco",
+		LogoColor: "black",
+		Href:      "https://www.cisco.com/",
+	}
+
 	ShieldCMake = &ShieldBadge{
 		ID:        "CMake",
 		Label:     "CMake",
@@ -125,6 +165,16 @@ var (
 		Logo:      "cmake",
 		LogoColor: "white",
 		Href:      "https://cmake.org/",
+	}
+
+	ShieldCodeCov = &ShieldBadge{
+		ID:        "CodeCov",
+		Label:     "CodeCov",
+		Color:     "#ff0077",
+		Style:     ShieldStyleForTheBadge,
+		Logo:      "codecov",
+		LogoColor: "white",
+		Href:      "https://codecov.io/",
 	}
 
 	ShieldDocker = &ShieldBadge{
@@ -175,6 +225,26 @@ var (
 		Logo:      "gradle",
 		LogoColor: "white",
 		Href:      "https://gradle.org/",
+	}
+
+	ShieldGrafana = &ShieldBadge{
+		ID:        "Grafana",
+		Label:     "Grafana",
+		Color:     "#F46800",
+		Style:     ShieldStyleForTheBadge,
+		Logo:      "grafana",
+		LogoColor: "white",
+		Href:      "https://grafana.com/",
+	}
+
+	ShieldKubernetes = &ShieldBadge{
+		ID:        "Kubernetes",
+		Label:     "Kubernetes",
+		Color:     "#326ce5",
+		Style:     ShieldStyleForTheBadge,
+		Logo:      "kubernetes",
+		LogoColor: "white",
+		Href:      "https://kubernetes.io/",
 	}
 
 	ShieldJupyterNotebook = &ShieldBadge{

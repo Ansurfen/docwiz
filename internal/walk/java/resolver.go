@@ -20,6 +20,8 @@ var shiledJavaResolver = &walk.DependencyResolver{
 		"odps-sdk":                   walk.SystemVersionBadge{Badge: badge.ShieldMaxCompute},
 		"lwjgl-opengl":               walk.SystemVersionBadge{Badge: badge.ShieldOpenGL},
 		"thymeleaf":                  walk.DependencyVersionBadge{Badge: badge.ShieldThymeleaf},
+		"hibernate-core":             walk.DependencyVersionBadge{Badge: badge.ShieldHibernate},
+		"jenkins-core":               walk.DependencyVersionBadge{Badge: badge.ShieldJenkins},
 	},
 	Fuzzy: walk.ResolverPattern{
 		"tomcat":  walk.DependencyVersionBadge{Badge: badge.ShieldApacheTomcat},
