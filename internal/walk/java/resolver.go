@@ -28,5 +28,6 @@ var shiledJavaResolver = &walk.DependencyResolver{
 		"apollo-": walk.DependencyVersionBadge{Badge: badge.ShieldApolloGraphQL},
 		"javafx":  walk.DependencyVersionBadge{Badge: badge.ShieldJavaFX},
 		"opencv":  walk.SystemVersionBadge{Badge: badge.ShieldOpenCV},
+		"quarkus": walk.SystemVersionBadge{Badge: badge.ShieldQuarkus},
 	},
 }

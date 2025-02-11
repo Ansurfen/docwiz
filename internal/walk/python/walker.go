@@ -5,10 +5,13 @@ package pythonwalk
 
 import (
 	"docwiz/internal/badge"
+	"docwiz/internal/cfg"
 	"docwiz/internal/walk"
 	"os"
 	"regexp"
 )
+
+var lib = []string{"FastAPI", "flask", "django", "jinja2", "odps"}
 
 var (
 	hasFastAPI    = regexp.MustCompile(`(?i)\b(import\s+FastAPI|from\s+FastAPI)`)
@@ -28,7 +31,7 @@ func (*Walker) SubscribeExt() []string {
 }
 
 func (*Walker) SubscribeFile() []string {
-	return []string{"pyproject.toml"}
+	return []string{"pyproject.toml", "requirements.txt"}
 }
 
 func (*Walker) ParseExt(fullpath string, ext string, ctx *walk.Context) error {
@@ -61,6 +64,20 @@ func (*Walker) ParseExt(fullpath string, ext string, ctx *walk.Context) error {
 }
 
 func (*Walker) ParseFile(fullpath string, file string, ctx *walk.Context) error {
-	ctx.Set("Poetry", walk.UpgradeBadge("Python", badge.ShieldPoetry))
+	ctx.Set("Python", walk.UpgradeBadge("Python", badge.ShieldPython))
+	switch file {
+	case "pyproject.toml":
+		ctx.Set("Poetry", walk.UpgradeBadge("Python", badge.ShieldPoetry))
+		poetry, err := cfg.LoadPoetryFromFile(file)
+		if err != nil {
+			return err
+		}
+
+		return walk.ResolveDependency(ctx,
+			map[walk.BadgeKind]*walk.DependencyResolver{
+				walk.BadgeKindShield: shieldPythonResolver,
+			}, poetry, "Python")
+	case "requirements.txt":
+	}
 	return nil
 }
