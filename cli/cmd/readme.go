@@ -100,10 +100,8 @@ theme, and whether to include copyright information.`,
   docwiz readme`,
 		Run: func(cmd *cobra.Command, args []string) {
 			if readmeParameter.scan {
-				ignore, err := cfg.LoadDocWizIgnore(".docwizignore")
-				if err != nil {
-					log.Fata(err)
-				}
+				ignore, _ := cfg.LoadDocWizIgnore(".docwizignore")
+
 				if len(readmeParameter.output) == 0 {
 					readmeParameter.output = "README.md"
 				}

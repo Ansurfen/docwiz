@@ -15,7 +15,7 @@ type DocWizIgnore struct {
 func LoadDocWizIgnore(filepath string) (*DocWizIgnore, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
-		return nil, err
+		return &DocWizIgnore{Git: &git.GitIgnore{}, Badges: map[string]struct{}{}}, err
 	}
 	defer file.Close()
 
