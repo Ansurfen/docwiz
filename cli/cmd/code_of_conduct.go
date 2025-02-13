@@ -23,8 +23,9 @@ type CodeOfConductCmdParameter struct {
 var (
 	conductParameter CodeOfConductCmdParameter
 	conductCmd       = &cobra.Command{
-		Use:   "conduct",
-		Short: "Generate a code of conduct for your project",
+		Use:     "code-of-conduct",
+		Aliases: []string{"coc"},
+		Short:   "Generate a code of conduct for your project",
 		Long: `The 'conduct' command generates a code of conduct file for your project, 
 which includes guidelines for respectful behavior, inclusivity, and maintaining a positive community environment.`,
 		Example: "  docwiz conduct",
