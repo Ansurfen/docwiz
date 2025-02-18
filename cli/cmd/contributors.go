@@ -6,8 +6,9 @@ package cmd
 import (
 	"docwiz/internal/git"
 	"docwiz/internal/io"
-	"docwiz/internal/log"
+	"docwiz/internal/style"
 
+	"github.com/caarlos0/log"
 	"github.com/spf13/cobra"
 )
 
@@ -30,38 +31,36 @@ to extract and list all contributors who have committed changes.`,
   docwiz contributors -r /path/to/repo -o contributors.txt
   docwiz contributors --disable-copyright`,
 		Run: func(cmd *cobra.Command, args []string) {
-			gen := &generator{
-				output: contributorsParameter.output,
-				action: func() {
-					output, err := io.NewSafeFile(contributorsParameter.output)
-					if err != nil {
-						log.Fata(err)
-					}
-					defer output.Close()
-
-					defer func() {
-						if err := recover(); err != nil {
-							output.Rollback()
-							log.Fata(err)
-						}
-					}()
-
-					r, err := git.New(contributorsParameter.repoPath)
-					if err != nil {
-						log.Fata(err)
-					}
-
-					err = r.GenerateContributors(output)
-					if err != nil {
-						log.Fata(err)
-					}
-
-					if !contributorsParameter.disableCopyright {
-						output.Write(COPYRIGHT)
-					}
-				},
+			log.Infof("creating %s", contributorsParameter.output)
+			output, err := io.NewSafeFile(contributorsParameter.output)
+			if err != nil {
+				log.WithError(err).Fatal("fail to create file")
 			}
-			gen.run()
+			defer output.Close()
+
+			defer func() {
+				if err := recover(); err != nil {
+					output.Rollback()
+					log.WithError(err.(error)).Fatal("error happen and rollback!")
+				}
+			}()
+
+			log.WithField("path", contributorsParameter.repoPath).Info("parsing .git directory")
+			r, err := git.New(contributorsParameter.repoPath)
+			if err != nil {
+				log.WithError(err).Fatal("fail to read git repository")
+			}
+
+			log.Infof("generating %s", style.Bold(contributorsParameter.output))
+			err = r.GenerateContributors(output)
+			if err != nil {
+				log.WithError(err).Fatal("fail to generate contributors")
+			}
+
+			if !contributorsParameter.disableCopyright {
+				output.Write(COPYRIGHT)
+			}
+			log.Info("thanks for using docwiz!")
 		},
 	}
 )

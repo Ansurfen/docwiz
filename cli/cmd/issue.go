@@ -6,12 +6,13 @@ package cmd
 import (
 	"docwiz/internal/git"
 	"docwiz/internal/io"
-	"docwiz/internal/log"
+
 	"docwiz/internal/os"
 	"docwiz/internal/template"
 	"fmt"
 	"path/filepath"
 
+	"github.com/caarlos0/log"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
 )
@@ -98,13 +99,34 @@ and other parameters.`,
 					issueParameter.issueDescription = "Suggest an idea for this project"
 				}
 			}
+
+			var (
+				output *io.SafeFile
+				err    error
+			)
+			log.Infof("creating %s", issueParameter.output)
+			output, err = io.NewSafeFile(issueParameter.output)
+			if err != nil {
+				log.WithError(err).Fatalf("fail to create file")
+			}
+			defer output.Close()
+
+			defer func() {
+				if err := recover(); err != nil {
+					output.Rollback()
+					log.WithError(err.(error)).Fatal("error happen and rollback!")
+				}
+			}()
+
 			if issueParameter.format == issueForamtYAML {
 				if len(issueParameter.output) == 0 {
 					issueParameter.output = "ISSUE.yaml"
 				}
+
+				log.WithField("path", issueParameter.repoPath).Info("parsing .git directory")
 				repo, err := git.New(issueParameter.repoPath)
 				if err != nil {
-					log.Fata(err)
+					log.WithError(err).Fatal("fail to read git repository")
 				}
 				title := "[Bug]: "
 				labels := []string{"bug", "question"}
@@ -171,21 +193,8 @@ and other parameters.`,
 
 				data, err := yaml.Marshal(&issueTmpl)
 				if err != nil {
-					log.Fata(err)
+					log.WithError(err).Fatal("marshaling template")
 				}
-
-				output, err := io.NewSafeFile(issueParameter.output)
-				if err != nil {
-					log.Fata(err)
-				}
-				defer output.Close()
-
-				defer func() {
-					if err := recover(); err != nil {
-						output.Rollback()
-						log.Fata(err)
-					}
-				}()
 
 				output.Write(data)
 			} else {
@@ -195,24 +204,18 @@ and other parameters.`,
 				issuePath := filepath.Join(os.TemplatePath, "ISSUE")
 				tpl := filepath.Join(issuePath, fmt.Sprintf("%s.%s.tpl", issueParameter.theme, issueParameter.kind))
 
-				output, err := io.NewSafeFile(issueParameter.output)
-				if err != nil {
-					log.Fata(err)
-				}
-				defer output.Close()
-
-				defer func() {
-					if err := recover(); err != nil {
-						output.Rollback()
-						log.Fata(err)
-					}
-				}()
-
+				log.WithField("target", tpl).Info("loading template")
 				tmpl, err := template.Default(tpl)
 				if err != nil {
-					log.Fata(err)
+					log.WithError(err).Fatal("fail to load template")
 				}
 
+				log.Info("executing template")
+				log.IncreasePadding()
+				log.WithField("IssueName", issueParameter.issueName).
+					WithField("IssueDescription", issueParameter.issueDescription).
+					WithField("IssueAssigness", issueParameter.issueAssigness).Info("parameters")
+				log.DecreasePadding()
 				err = tmpl.Execute(output, map[string]any{
 					"IssueName":        issueParameter.issueName,
 					"IssueDescription": issueParameter.issueDescription,
@@ -220,9 +223,11 @@ and other parameters.`,
 				})
 
 				if err != nil {
-					log.Fata(err)
+					log.WithError(err).Fatal("fail to execute template")
 				}
 			}
+
+			log.Info("thanks for using docwiz!")
 		},
 	}
 )

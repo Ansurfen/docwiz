@@ -5,13 +5,15 @@ package cmd
 
 import (
 	"docwiz/internal/io"
-	"docwiz/internal/log"
+	"docwiz/internal/style"
+
 	"docwiz/internal/os"
 	"docwiz/internal/template"
 	"fmt"
 
 	"path/filepath"
 
+	"github.com/caarlos0/log"
 	"github.com/spf13/cobra"
 )
 
@@ -37,41 +39,39 @@ which includes guidelines for respectful behavior, inclusivity, and maintaining 
 				tpl = filepath.Join(conductPath, conductParameter.language, fmt.Sprintf("%s.tpl", conductParameter.theme))
 			}
 
-			gen := &generator{
-				output: conductParameter.output,
-				action: func() {
-					output, err := io.NewSafeFile(conductParameter.output)
-					if err != nil {
-						log.Fata(err)
-					}
-					defer output.Close()
-
-					defer func() {
-						if err := recover(); err != nil {
-							output.Rollback()
-							log.Fata(err)
-						}
-					}()
-
-					tmpl, err := template.Default(tpl)
-
-					if err != nil {
-						log.Fata(err)
-					}
-
-					err = tmpl.Execute(output, map[string]any{
-						"Email": conductParameter.email,
-					})
-					if err != nil {
-						log.Fata(err)
-					}
-
-					if conductParameter.disableCopyright {
-						output.Write([]byte(COPYRIGHT))
-					}
-				},
+			log.Infof("creating %s", authorsParameter.output)
+			output, err := io.NewSafeFile(conductParameter.output)
+			if err != nil {
+				log.WithError(err).Fatalf("fail to create file")
 			}
-			gen.run()
+			defer output.Close()
+
+			defer func() {
+				if err := recover(); err != nil {
+					output.Rollback()
+					log.WithError(err.(error)).Fatal("error happen and rollback!")
+				}
+			}()
+
+			log.WithField("target", tpl).Info("loading template")
+			tmpl, err := template.Default(tpl)
+			if err != nil {
+				log.WithError(err).Fatal("fail to load template")
+			}
+
+			log.Info("executing template")
+			err = tmpl.Execute(output, map[string]any{
+				"Email": conductParameter.email,
+			})
+			if err != nil {
+				log.WithError(err).Fatal("fail to execute template")
+			}
+
+			if conductParameter.disableCopyright {
+				output.Write([]byte(COPYRIGHT))
+			}
+			log.Infof("generating %s", style.Bold(conductParameter.output))
+			log.Info("thanks for using docwiz!")
 		},
 	}
 )

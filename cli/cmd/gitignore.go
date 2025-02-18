@@ -5,8 +5,9 @@ package cmd
 
 import (
 	"docwiz/internal/io"
-	"docwiz/internal/log"
+
 	"docwiz/internal/os"
+	"docwiz/internal/style"
 	"docwiz/internal/tui"
 
 	"fmt"
@@ -14,6 +15,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/caarlos0/log"
 	"github.com/spf13/cobra"
 )
 
@@ -47,6 +49,7 @@ You can specify a template directly or pick one interactively.`,
 			index := map[string]string{}
 			key2File := map[string]string{}
 
+			log.Infof("loading template from %s", gitignorePath)
 			err := filepath.Walk(gitignorePath, func(path string, info fs.FileInfo, err error) error {
 				if err != nil {
 					return err
@@ -80,7 +83,7 @@ You can specify a template directly or pick one interactively.`,
 			})
 
 			if err != nil {
-				log.Fata(err)
+				log.WithError(err).Fatal("fail to read .gitignore template")
 			}
 
 			var key string
@@ -101,7 +104,7 @@ You can specify a template directly or pick one interactively.`,
 					Candicates:  gitignores,
 				})
 				if err = m.Run(); err != nil {
-					log.Fata(err)
+					log.WithError(err).Fatal("running select model")
 				}
 
 				key = m.Value()
@@ -111,18 +114,15 @@ You can specify a template directly or pick one interactively.`,
 				if len(gitignoreParameter.output) == 0 {
 					gitignoreParameter.output = ".gitignore"
 				}
-				gen := &generator{
-					output: gitignoreParameter.output,
-					action: func() {
-						io.WriteFileFrom(v, gitignoreParameter.output)
-					},
-				}
-				gen.run()
+
+				log.Infof("generating %s", style.Bold(gitignoreParameter.output))
+				io.WriteFileFrom(v, gitignoreParameter.output)
 			}
 
 			if err != nil {
-				log.Fata(err)
+				log.WithError(err).Fatal("")
 			}
+			log.Info("thanks for using docwiz!")
 		},
 	}
 )

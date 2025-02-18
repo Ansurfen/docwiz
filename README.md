@@ -24,11 +24,11 @@ English | [简体中文](docs/zh_cn/README.md)
 git clone git@github.com:Ansurfen/docwiz.git
 cd ./docwiz
 
-# windows
-./build.ps1
+# method 1: using goreleaser
+goreleaser release --snapshot --clean
 
-# linux, darwin
-./build.sh
+# method 2: using goreleaser, aliax
+aliax release
 ```
 
 ### download

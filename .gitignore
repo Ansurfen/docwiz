@@ -31,3 +31,8 @@ go.work.sum
 docwiz
 
 log/
+
+# Added by goreleaser init:
+dist/
+
+run-scripts/

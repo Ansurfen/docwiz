@@ -6,8 +6,8 @@ package cmd
 import (
 	"docwiz/internal/cfg"
 	"docwiz/internal/io"
-	"docwiz/internal/log"
 	"docwiz/internal/os"
+	"docwiz/internal/style"
 	"docwiz/internal/template"
 	"docwiz/internal/tui"
 	"docwiz/internal/walk"
@@ -70,6 +70,7 @@ import (
 	"io/fs"
 	"path/filepath"
 
+	"github.com/caarlos0/log"
 	"github.com/spf13/cobra"
 )
 
@@ -173,46 +174,42 @@ theme, and whether to include copyright information.`,
 					},
 				}
 				walk.Walk(".", ctx)
-
-				gen := &generator{
-					output: readmeParameter.output,
-					action: func() {
-
-						tmpl, err := template.New(tpl).LoadStdlib().Parse()
-						if err != nil {
-							log.Fata(err)
-						}
-						output, err := io.NewSafeFile(readmeParameter.output)
-						if err != nil {
-							log.Fata(err)
-						}
-						defer output.Close()
-
-						defer func() {
-							if err := recover(); err != nil {
-								output.Rollback()
-								log.Fata(err)
-							}
-						}()
-
-						err = tmpl.Execute(output, map[string]any{
-							"ProjectName":        ctx.ProjectName,
-							"ProjectOwner":       ctx.ProjectOwner,
-							"ProjectStack":       ctx.ProjectStack,
-							"ProjectDescription": ctx.ProjectDescription,
-							"Sections":           ctx.Sections,
-						})
-
-						if err != nil {
-							log.Fata(err)
-						}
-
-						if !readmeParameter.disableCopyright {
-							output.Write(COPYRIGHT)
-						}
-					},
+				tmpl, err := template.New(tpl).LoadStdlib().Parse()
+				if err != nil {
+					log.WithError(err).Fatal("loading template")
 				}
-				gen.run()
+
+				log.Infof("creating %s", readmeParameter.output)
+				output, err := io.NewSafeFile(readmeParameter.output)
+				if err != nil {
+					log.WithError(err).Fatalf("fail to create file")
+				}
+				defer output.Close()
+
+				defer func() {
+					if err := recover(); err != nil {
+						output.Rollback()
+						log.WithError(err.(error)).Fatal("error happen and rollback!")
+					}
+				}()
+
+				err = tmpl.Execute(output, map[string]any{
+					"ProjectName":        ctx.ProjectName,
+					"ProjectOwner":       ctx.ProjectOwner,
+					"ProjectStack":       ctx.ProjectStack,
+					"ProjectDescription": ctx.ProjectDescription,
+					"Sections":           ctx.Sections,
+				})
+
+				if err != nil {
+					log.WithError(err).Fatal("executing template")
+				} else {
+					log.Info("executing template")
+				}
+
+				if !readmeParameter.disableCopyright {
+					output.Write(COPYRIGHT)
+				}
 			} else {
 				var chosedTemplate string
 				if len(readmeParameter.template) != 0 {
@@ -242,7 +239,7 @@ theme, and whether to include copyright information.`,
 					})
 
 					if err := m.Run(); err != nil {
-						log.Fata(err)
+						log.WithError(err).Fatal("")
 					}
 					chosedTemplate = m.Value()
 				}
@@ -258,56 +255,54 @@ theme, and whether to include copyright information.`,
 
 					err := io.ReadJSON(filepath.Join(templateDir, "index.json"), &index)
 					if err != nil {
-						log.Fata(err)
+						log.WithError(err).Fatal("reading json")
 					}
 					questions = append(questions, index.Questions...)
 				}
 
 				m := tui.NewReadmeModel(questions...)
 
-				fmt.Println("🥳 Welcome to use docwiz to create readme.md (use tab to enable default)")
+				log.Info("🥳 Welcome to use docwiz to create readme.md (use tab to enable default)")
 				if err := m.Run(); err != nil {
-					log.Fata(err)
+					log.WithError(err).Fatal("running readme model")
 				}
 
-				gen := &generator{
-					output: readmeParameter.output,
-					action: func() {
-						tpl := filepath.Join(templateDir, fmt.Sprintf("%s.tpl", readmeParameter.theme))
-						if readmeParameter.language != defaultLanguage {
-							tpl = filepath.Join(templateDir, readmeParameter.language, fmt.Sprintf("%s.tpl", readmeParameter.theme))
-						}
-
-						tmpl, err := template.New(tpl).LoadStdlib().Parse()
-						if err != nil {
-							log.Fata(err)
-						}
-
-						output, err := io.NewSafeFile(readmeParameter.output)
-						if err != nil {
-							log.Fata(err)
-						}
-						defer output.Close()
-
-						defer func() {
-							if err := recover(); err != nil {
-								output.Rollback()
-								log.Fata(err)
-							}
-						}()
-
-						err = tmpl.Execute(output, m.Value())
-						if err != nil {
-							log.Fata(err)
-						}
-
-						if !readmeParameter.disableCopyright {
-							output.Write(COPYRIGHT)
-						}
-					},
+				tpl := filepath.Join(templateDir, fmt.Sprintf("%s.tpl", readmeParameter.theme))
+				if readmeParameter.language != defaultLanguage {
+					tpl = filepath.Join(templateDir, readmeParameter.language, fmt.Sprintf("%s.tpl", readmeParameter.theme))
 				}
-				gen.run()
+
+				tmpl, err := template.New(tpl).LoadStdlib().Parse()
+				if err != nil {
+					log.WithError(err).Fatal("loading template")
+				}
+
+				output, err := io.NewSafeFile(readmeParameter.output)
+				if err != nil {
+					log.WithError(err).Fatalf("creating %s", readmeParameter.output)
+				}
+				defer output.Close()
+
+				defer func() {
+					if err := recover(); err != nil {
+						output.Rollback()
+						log.WithError(err.(error)).Fatal("error happen and rollback!")
+					}
+				}()
+
+				err = tmpl.Execute(output, m.Value())
+				if err != nil {
+					log.WithError(err).Fatal("executing template")
+				} else {
+					log.Info("executing template")
+				}
+
+				if !readmeParameter.disableCopyright {
+					output.Write(COPYRIGHT)
+				}
 			}
+			log.Infof("generating %s", style.Bold(readmeParameter.output))
+			log.Info("thanks for using docwiz!")
 		},
 	}
 )

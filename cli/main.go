@@ -5,8 +5,11 @@ package main
 
 import (
 	"docwiz/cli/cmd"
+
+	"github.com/caarlos0/log"
 )
 
 func main() {
+	log.SetLevel(log.DebugLevel)
 	cmd.Execute()
 }

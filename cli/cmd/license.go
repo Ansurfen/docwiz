@@ -5,7 +5,8 @@ package cmd
 
 import (
 	"docwiz/internal/io"
-	"docwiz/internal/log"
+	"docwiz/internal/style"
+
 	"docwiz/internal/os"
 	"docwiz/internal/tui"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/caarlos0/log"
 	"github.com/spf13/cobra"
 )
 
@@ -52,7 +54,7 @@ and year, or select interactively from available licenses.`,
 
 			err := io.ReadJSON(indexFile, &index)
 			if err != nil {
-				log.Fata(err)
+				log.WithError(err).Fatal("reading json")
 			}
 
 			var key string
@@ -75,7 +77,7 @@ and year, or select interactively from available licenses.`,
 				})
 
 				if err = m.Run(); err != nil {
-					log.Fata(err)
+					log.WithError(err).Fatal("running select model")
 				}
 				key = m.Value()
 			}
@@ -83,38 +85,46 @@ and year, or select interactively from available licenses.`,
 			if v := index[key]; len(v) != 0 {
 				tpl := filepath.Join(os.TemplatePath, fmt.Sprintf("LICENSE/%s.tpl", v))
 
-				gen := &generator{
-					output: licenseParameter.output,
-					action: func() {
-						output, err := io.NewSafeFile(licenseParameter.output)
-						if err != nil {
-							panic(err)
-						}
-						defer output.Close()
-
-						defer func() {
-							if err := recover(); err != nil {
-								output.Rollback()
-								log.Fata(err)
-							}
-						}()
-
-						tmpl, err := template.ParseFiles(tpl)
-						if err != nil {
-							log.Fata(err)
-						}
-
-						err = tmpl.Execute(output, map[string]any{
-							"Year":   licenseParameter.year,
-							"Author": licenseParameter.author,
-						})
-						if err != nil {
-							log.Fata(err)
-						}
-					},
+				log.Infof("creating %s", licenseParameter.output)
+				output, err := io.NewSafeFile(licenseParameter.output)
+				if err != nil {
+					log.WithError(err).Fatalf("fail to create file")
 				}
-				gen.run()
+				defer output.Close()
+
+				defer func() {
+					if err := recover(); err != nil {
+						output.Rollback()
+						log.WithError(err.(error)).Fatal("error happen and rollback!")
+					}
+				}()
+
+				log.WithField("target", tpl).Info("loading template")
+				tmpl, err := template.ParseFiles(tpl)
+				if err != nil {
+					log.WithError(err).Fatal("fail to load template")
+				}
+
+				log.Info("executing template")
+				log.IncreasePadding()
+				log.WithField("Year", licenseParameter.year).
+					WithField("Author", licenseParameter.author).
+					Info("parameters")
+				if len(licenseParameter.author) == 0 {
+					log.Warnf("you can use %s to specify the author parameter", style.Keyword("-a docwiz"))
+				}
+				log.DecreasePadding()
+				err = tmpl.Execute(output, map[string]any{
+					"Year":   licenseParameter.year,
+					"Author": licenseParameter.author,
+				})
+				if err != nil {
+					log.WithError(err).Fatal("fail to execute template")
+				}
 			}
+
+			log.Infof("generating %s", style.Bold(licenseParameter.output))
+			log.Info("thanks for using docwiz!")
 		},
 	}
 )

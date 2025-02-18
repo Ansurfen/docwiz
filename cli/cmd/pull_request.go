@@ -5,12 +5,14 @@ package cmd
 
 import (
 	"docwiz/internal/io"
-	"docwiz/internal/log"
+	"docwiz/internal/style"
+
 	"docwiz/internal/os"
 	"docwiz/internal/template"
 	"fmt"
 	"path/filepath"
 
+	"github.com/caarlos0/log"
 	"github.com/spf13/cobra"
 )
 
@@ -35,34 +37,34 @@ You can customize the template rendering by specifying the theme. The template w
 			prPath := filepath.Join(os.TemplatePath, "PULL_REQUEST")
 			tpl := filepath.Join(prPath, fmt.Sprintf("%s.tpl", pullRequestParameter.theme))
 
-			gen := generator{
-				output: pullRequestParameter.output,
-				action: func() {
-					output, err := io.NewSafeFile(pullRequestParameter.output)
-					if err != nil {
-						log.Fata(err)
-					}
-					defer output.Close()
-
-					defer func() {
-						if err := recover(); err != nil {
-							output.Rollback()
-							log.Fata(err)
-						}
-					}()
-
-					tmpl, err := template.Default(tpl)
-					if err != nil {
-						log.Fata(err)
-					}
-
-					err = tmpl.Execute(output, nil)
-					if err != nil {
-						log.Fata(err)
-					}
-				},
+			log.Infof("creating %s", pullRequestParameter.output)
+			output, err := io.NewSafeFile(pullRequestParameter.output)
+			if err != nil {
+				log.WithError(err).Fatalf("fail to create %s", pullRequestParameter.output)
 			}
-			gen.run()
+			defer output.Close()
+
+			defer func() {
+				if err := recover(); err != nil {
+					output.Rollback()
+					log.WithError(err.(error)).Fatal("error happen and rollback!")
+				}
+			}()
+
+			log.Info("loading template")
+			tmpl, err := template.Default(tpl)
+			if err != nil {
+				log.WithError(err).Fatal("fail to template")
+			}
+
+			log.Info("executing template")
+			err = tmpl.Execute(output, nil)
+			if err != nil {
+				log.WithError(err).Fatal("fail to execute template")
+			}
+
+			log.Infof("generating %s", style.Bold(readmeParameter.output))
+			log.Info("thanks for using docwiz!")
 		},
 	}
 )

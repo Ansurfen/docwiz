@@ -4,8 +4,6 @@
 package cmd
 
 import (
-	"docwiz/internal/tui"
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -54,19 +52,6 @@ type baseParameter struct {
 	disableCopyright bool
 
 	verbose bool
-}
-
-type generator struct {
-	output string
-	action func()
-}
-
-func (g *generator) run() error {
-	err := tui.NewSpinner(g.action, fmt.Sprintf("Generating %s...", g.output)).Run()
-	if err != nil {
-		return err
-	}
-	return tui.NewTextFrame(fmt.Sprintf("%s was successfully generated.\n\nThanks for using docwiz!", g.output)).Run()
 }
 
 // todo

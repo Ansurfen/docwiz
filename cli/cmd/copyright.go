@@ -5,12 +5,13 @@ package cmd
 
 import (
 	"bytes"
-	"docwiz/internal/log"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strconv"
+
+	"github.com/caarlos0/log"
 
 	"github.com/spf13/cobra"
 )
@@ -50,37 +51,50 @@ It supports inserting content from a file or directly from a string.`,
   docwiz copyright -p "src/*.js" -f LICENSE_HEADER.txt
   docwiz copyright -p "*.md" --tail --repeat -c "© 2025 Open Source Project"`,
 		Run: func(cmd *cobra.Command, args []string) {
+			log.Infof("globing %s", copyrightParameter.pattern)
 			files, err := filepath.Glob(copyrightParameter.pattern)
 			if err != nil {
-				log.Fata(err)
+				log.WithError(err).Fatalf("fail to parse glob pattern")
 			}
 
 			if len(copyrightParameter.file) != 0 {
 				data, err := os.ReadFile(copyrightParameter.file)
 				if err != nil {
-					log.Fata(err)
+					log.WithError(err).Fatal("invalid copyright file")
 				}
 				copyrightParameter.content = string(data)
 			}
 
 			if !copyrightParameter.repeat {
 				for _, file := range files {
+					log.Infof("visiting %s", file)
+					log.IncreasePadding()
 					if copyrightParameter.tailInsert {
-						uniqueAppendToFile(file, []byte(copyrightParameter.content))
+						err = uniqueAppendToFile(file, []byte(copyrightParameter.content))
 					} else {
-						uniquePrependToFile(file, []byte(copyrightParameter.content))
+						err = uniquePrependToFile(file, []byte(copyrightParameter.content))
 					}
+					if err != nil {
+						log.WithError(err).Error("error happen")
+					}
+					log.DecreasePadding()
 				}
 			} else {
 				for _, file := range files {
+					log.Infof("visiting %s", file)
+					log.IncreasePadding()
 					if copyrightParameter.tailInsert {
-						appendToTail(file, copyrightParameter.content)
+						err = appendToTail(file, copyrightParameter.content)
 					} else {
-						insertAtHead(file, copyrightParameter.content)
+						err = insertAtHead(file, copyrightParameter.content)
 					}
+					if err != nil {
+						log.WithError(err).Error("error happen")
+					}
+					log.DecreasePadding()
 				}
 			}
-
+			log.Info("thanks for using docwiz!")
 		},
 	}
 )
@@ -114,7 +128,7 @@ func uniquePrependToFile(filePath string, prefix []byte) error {
 
 	// If the file already starts with the prefix, return
 	if bytes.HasPrefix(buffer, prefix) {
-		log.Warnf("%s %s File already starts with the given prefix, no need to insert.\n", filePath)
+		log.Warnf("file already starts with the given prefix, no need to insert.")
 		return nil
 	}
 
@@ -133,7 +147,6 @@ func uniquePrependToFile(filePath string, prefix []byte) error {
 		return err
 	}
 
-	log.Infof("%s %s Prefix inserted successfully.\n", filePath)
 	return nil
 }
 
@@ -149,7 +162,7 @@ func uniqueAppendToFile(filePath string, suffix []byte) error {
 
 	// Check if the file already ends with the suffix
 	if bytes.HasSuffix(data, suffix) {
-		log.Warnf("%s %s The file already ends with the specified suffix, skipping append.\n", filePath)
+		log.Warn("file already ends with the specified suffix, skipping append.")
 		return nil
 	}
 
@@ -165,8 +178,6 @@ func uniqueAppendToFile(filePath string, suffix []byte) error {
 	if err != nil {
 		return err
 	}
-
-	log.Infof("%s %s Data successfully appended to the file.\n", filePath)
 	return nil
 }
 

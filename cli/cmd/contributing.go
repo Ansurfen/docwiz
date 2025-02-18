@@ -6,13 +6,15 @@ package cmd
 import (
 	"docwiz/internal/git"
 	"docwiz/internal/io"
-	"docwiz/internal/log"
+	"docwiz/internal/style"
+
 	"docwiz/internal/os"
 	"docwiz/internal/template"
 	"fmt"
 
 	"path/filepath"
 
+	"github.com/caarlos0/log"
 	"github.com/spf13/cobra"
 )
 
@@ -38,12 +40,13 @@ You can provide information like contribution guidelines, code of conduct, and s
 				owner string
 			)
 
+			log.WithField("path", contributingParameter.repoPath).Info("parsing .git directory")
 			repo, err := git.New(contributingParameter.repoPath)
 			if err == nil {
 				name = repo.Name()
 				owner = repo.Owner()
 			} else {
-				log.Warnf("fail to read git repository, err: %s", err.Error())
+				log.WithError(err).Warnf("fail to read git repository")
 			}
 
 			contributingPath := filepath.Join(os.TemplatePath, "CONTRIBUTING")
@@ -52,42 +55,48 @@ You can provide information like contribution guidelines, code of conduct, and s
 			if contributingParameter.language != defaultLanguage {
 				tpl = filepath.Join(contributingPath, contributingParameter.language, fmt.Sprintf("%s.tpl", contributingParameter.theme))
 			}
-			gen := &generator{
-				output: contributingParameter.output,
-				action: func() {
-					output, err := io.NewSafeFile(contributingParameter.output)
-					if err != nil {
-						log.Fata(err)
-					}
-					defer output.Close()
 
-					defer func() {
-						if err := recover(); err != nil {
-							output.Rollback()
-							log.Fata(err)
-						}
-					}()
-
-					tmpl, err := template.Default(tpl)
-
-					if err != nil {
-						log.Fata(err)
-					}
-
-					err = tmpl.Execute(output, map[string]any{
-						"ProjectName":  name,
-						"ProjectOwner": owner,
-					})
-					if err != nil {
-						log.Fata(err)
-					}
-
-					if !contributingParameter.disableCopyright {
-						output.Write(COPYRIGHT)
-					}
-				},
+			log.Infof("creating %s", contributingParameter.output)
+			output, err := io.NewSafeFile(contributingParameter.output)
+			if err != nil {
+				log.WithError(err).Fatalf("fail to create file")
 			}
-			gen.run()
+			defer output.Close()
+
+			defer func() {
+				if err := recover(); err != nil {
+					output.Rollback()
+					log.WithError(err.(error)).Fatal("error happen and rollback!")
+				}
+			}()
+
+			log.WithField("theme", contributorsParameter.theme).
+				WithField("language", contributingParameter.language).
+				WithField("target", tpl).Info("loading template")
+			tmpl, err := template.Default(tpl)
+
+			if err != nil {
+				log.WithError(err).Fatal("fail to load template")
+			}
+
+			log.Info("executing template")
+			log.IncreasePadding()
+			log.WithField("ProjectName", name).WithField("ProjectOwner", owner).Info("parameters")
+			log.DecreasePadding()
+			err = tmpl.Execute(output, map[string]any{
+				"ProjectName":  name,
+				"ProjectOwner": owner,
+			})
+			if err != nil {
+				log.WithError(err).Fatal("fail to execute template")
+			}
+
+			if !contributingParameter.disableCopyright {
+				output.Write(COPYRIGHT)
+			}
+
+			log.Infof("generating %s", style.Bold(changelogParameter.output))
+			log.Info("thanks for using docwiz!")
 		},
 	}
 )

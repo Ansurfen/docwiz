@@ -5,6 +5,7 @@ go 1.23
 require (
 	github.com/Masterminds/semver/v3 v3.3.0
 	github.com/Masterminds/sprig/v3 v3.3.0
+	github.com/caarlos0/log v0.4.8
 	github.com/charmbracelet/bubbles v0.20.0
 	github.com/charmbracelet/bubbletea v1.2.5-0.20241205214244-9306010a31ee
 	github.com/charmbracelet/huh v0.6.0
@@ -14,6 +15,8 @@ require (
 	github.com/spf13/cobra v1.8.1
 	golang.org/x/mod v0.17.0
 )
+
+require github.com/elliotchance/orderedmap/v2 v2.7.0 // indirect
 
 require (
 	github.com/BurntSushi/toml v1.4.0

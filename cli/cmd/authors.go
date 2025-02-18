@@ -5,7 +5,8 @@ package cmd
 
 import (
 	"docwiz/internal/io"
-	"docwiz/internal/log"
+	"docwiz/internal/style"
+
 	"docwiz/internal/os"
 	"docwiz/internal/template"
 	"fmt"
@@ -13,6 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/caarlos0/log"
 	"github.com/spf13/cobra"
 )
 
@@ -47,28 +49,37 @@ var (
     -c 'name=Bob,duty="Contributor"' -s 'name=Charlie,duty="Special Contributor"'`,
 		Run: func(cmd *cobra.Command, args []string) {
 			var maintainers, contributors, specialContributors []user
-
+			log.Info("parsing users")
 			for _, m := range authorsParameter.maintainers {
 				user, err := unmarshalUser(m)
 				if err != nil {
-					log.Fata(err)
+					log.WithError(err).Fatal("parsing maintainers")
 				}
+				log.IncreasePadding()
+				log.Infof("%s, maintainer", user.Name)
+				log.DecreasePadding()
 				maintainers = append(maintainers, user)
 			}
 
 			for _, c := range authorsParameter.contributors {
 				user, err := unmarshalUser(c)
 				if err != nil {
-					log.Fata(err)
+					log.WithError(err).Fatal("parsing contributors")
 				}
+				log.IncreasePadding()
+				log.Infof("%s, contributors", user.Name)
+				log.DecreasePadding()
 				contributors = append(contributors, user)
 			}
 
 			for _, s := range authorsParameter.specialContributors {
 				user, err := unmarshalUser(s)
 				if err != nil {
-					log.Fata(err)
+					log.WithError(err).Fatal("parsing special contributors")
 				}
+				log.IncreasePadding()
+				log.Infof("%s, special contributors", user.Name)
+				log.DecreasePadding()
 				specialContributors = append(specialContributors, user)
 			}
 
@@ -79,44 +90,48 @@ var (
 
 			tpl := filepath.Join(authrosPath, fmt.Sprintf("%s.tpl", authorsParameter.theme))
 
-			gen := &generator{
-				output: authorsParameter.output,
-				action: func() {
-					output, err := io.NewSafeFile(authorsParameter.output)
-					if err != nil {
-						log.Fata(err)
-					}
-					defer output.Close()
-
-					defer func() {
-						if err := recover(); err != nil {
-							output.Rollback()
-							log.Fata(err)
-						}
-					}()
-
-					tmpl, err := template.Default(tpl)
-					if err != nil {
-						log.Fata(err)
-					}
-
-					err = tmpl.Execute(output, map[string]any{
-						"Maintainers":         maintainers,
-						"Contributors":        contributors,
-						"SpecialContributors": specialContributors,
-						"License":             authorsParameter.license,
-						"Copyright":           authorsParameter.disableCopyright,
-					})
-					if err != nil {
-						log.Fata(err)
-					}
-
-					if !authorsParameter.disableCopyright {
-						output.Write(COPYRIGHT)
-					}
-				},
+			log.Infof("creating %s", authorsParameter.output)
+			output, err := io.NewSafeFile(authorsParameter.output)
+			if err != nil {
+				log.WithError(err).Fatalf("fail to create file")
 			}
-			gen.run()
+			defer output.Close()
+
+			defer func() {
+				if err := recover(); err != nil {
+					output.Rollback()
+					log.WithError(err.(error)).Fatal("error happen and rollback!")
+				}
+			}()
+
+			log.WithField("target", tpl).Info("loading template")
+			tmpl, err := template.Default(tpl)
+			if err != nil {
+				log.WithError(err).Fatal("fail to load template")
+			}
+
+			log.Info("executing template")
+			log.IncreasePadding()
+			log.WithField("Maintainers", authorsParameter.maintainers).
+				WithField("Contributors", authorsParameter.contributors).
+				WithField("SpecialContributors", authorsParameter.specialContributors).
+				WithField("License", authorsParameter.license).Info("parameters")
+			log.DecreasePadding()
+			err = tmpl.Execute(output, map[string]any{
+				"Maintainers":         maintainers,
+				"Contributors":        contributors,
+				"SpecialContributors": specialContributors,
+				"License":             authorsParameter.license,
+			})
+			if err != nil {
+				log.WithError(err).Fatal("fail to execute template")
+			}
+
+			if !authorsParameter.disableCopyright {
+				output.Write(COPYRIGHT)
+			}
+			log.Infof("generating %s", style.Bold(authorsParameter.output))
+			log.Info("thanks for using docwiz!")
 		},
 	}
 )

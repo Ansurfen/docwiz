@@ -5,13 +5,15 @@ package cmd
 
 import (
 	"docwiz/internal/io"
-	"docwiz/internal/log"
+
 	"docwiz/internal/os"
+	"docwiz/internal/style"
 	"docwiz/internal/template"
 	"fmt"
 
 	"path/filepath"
 
+	"github.com/caarlos0/log"
 	"github.com/spf13/cobra"
 )
 
@@ -38,41 +40,51 @@ based on predefined templates and provide information like versioning, kind, the
 			}
 			tpl := filepath.Join(roadMapPath, fmt.Sprintf("%s.%s.tpl", roadMapParameter.kind, roadMapParameter.theme))
 
-			gen := &generator{
-				output: roadMapParameter.output,
-				action: func() {
-					output, err := io.NewSafeFile(roadMapParameter.output)
-					if err != nil {
-						log.Fata(err)
-					}
-					defer output.Close()
-
-					defer func() {
-						if err := recover(); err != nil {
-							output.Rollback()
-							log.Fata(err)
-						}
-					}()
-
-					tmpl, err := template.Default(tpl)
-					if err != nil {
-						log.Fata(err)
-					}
-
-					err = tmpl.Execute(output, map[string]any{
-						"Version": roadMapParameter.data["version"],
-					})
-
-					if err != nil {
-						log.Fata(err)
-					}
-
-					if !roadMapParameter.disableCopyright {
-						output.Write(COPYRIGHT)
-					}
-				},
+			log.Infof("creating %s", roadMapParameter.output)
+			output, err := io.NewSafeFile(roadMapParameter.output)
+			if err != nil {
+				log.WithError(err).Fatalf("fail to create file")
 			}
-			gen.run()
+			defer output.Close()
+
+			defer func() {
+				if err := recover(); err != nil {
+					output.Rollback()
+					log.WithError(err.(error)).Fatal("error happen and rollback!")
+				}
+			}()
+
+			log.WithField("kind", roadMapParameter.kind).
+				WithField("theme", roadMapParameter.theme).
+				WithField("language", roadMapParameter.language).
+				WithField("target", tpl).Info("loading template")
+			tmpl, err := template.Default(tpl)
+			if err != nil {
+				log.WithError(err).Fatal("fail to load template")
+			}
+
+			version := roadMapParameter.data["version"]
+			log.Info("executing template")
+			log.IncreasePadding()
+			log.WithField("version", version).Info("parameters")
+			if len(version) == 0 {
+				log.Warnf("you can use %s to specify the version parameter", style.Keyword("-d version=1.0.0"))
+			}
+			log.DecreasePadding()
+
+			err = tmpl.Execute(output, map[string]any{
+				"Version": version,
+			})
+
+			if err != nil {
+				log.WithError(err).Fatal("fail to load template")
+			}
+
+			if !roadMapParameter.disableCopyright {
+				output.Write(COPYRIGHT)
+			}
+			log.Infof("generating %s", style.Bold(roadMapParameter.output))
+			log.Info("thanks for using docwiz!")
 		},
 	}
 )

@@ -6,12 +6,12 @@ package cmd
 import (
 	"docwiz/internal/git"
 	"docwiz/internal/io"
-	"docwiz/internal/log"
 	"docwiz/internal/os"
 	"docwiz/internal/template"
 	"fmt"
 	"path/filepath"
 
+	"github.com/caarlos0/log"
 	"github.com/spf13/cobra"
 )
 
@@ -40,6 +40,7 @@ var (
 				owner string
 			)
 
+			log.WithField("path", securityParameter.repoPath).Info("parsing .git directory")
 			repo, err := git.New(securityParameter.repoPath)
 			if err == nil {
 				name = repo.Name()
@@ -54,43 +55,47 @@ var (
 			}
 			tpl := filepath.Join(securityPath, fmt.Sprintf("%s.tpl", securityParameter.theme))
 
-			gen := &generator{
-				output: securityParameter.output,
-				action: func() {
-					output, err := io.NewSafeFile(securityParameter.output)
-					if err != nil {
-						log.Fata(err)
-					}
-					defer output.Close()
-
-					defer func() {
-						if err := recover(); err != nil {
-							output.Rollback()
-							log.Fata(err)
-						}
-					}()
-
-					tmpl, err := template.Default(tpl)
-
-					if err != nil {
-						log.Fata(err)
-					}
-
-					err = tmpl.Execute(output, map[string]any{
-						"ProjectName":  name,
-						"ProjectOwner": owner,
-						"Email":        securityParameter.email,
-					})
-					if err != nil {
-						log.Fata(err)
-					}
-
-					if !securityParameter.disableCopyright {
-						output.Write(COPYRIGHT)
-					}
-				},
+			log.Infof("creating %s", securityParameter.output)
+			output, err := io.NewSafeFile(securityParameter.output)
+			if err != nil {
+				log.WithError(err).Fatal("fail to create file")
 			}
-			gen.run()
+			defer output.Close()
+
+			defer func() {
+				if err := recover(); err != nil {
+					output.Rollback()
+					log.WithError(err.(error)).Fatal("error happen and rollback!")
+				}
+			}()
+
+			log.WithField("target", tpl).Info("loading template")
+			tmpl, err := template.Default(tpl)
+
+			if err != nil {
+				log.WithError(err).Fatal("fail to load template")
+			}
+
+			log.Info("executing template")
+			log.IncreasePadding()
+			log.WithField("ProjectName", name).
+				WithField("ProjectOwner", owner).
+				WithField("Email", securityParameter.email).Info("parameters")
+			log.DecreasePadding()
+			err = tmpl.Execute(output, map[string]any{
+				"ProjectName":  name,
+				"ProjectOwner": owner,
+				"Email":        securityParameter.email,
+			})
+			if err != nil {
+				log.WithError(err).Fatal("fail to execute template")
+			}
+
+			if !securityParameter.disableCopyright {
+				output.Write(COPYRIGHT)
+			}
+
+			log.Info("thanks for using docwiz!")
 		},
 	}
 )
